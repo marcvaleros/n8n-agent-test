@@ -1,0 +1,146 @@
+{
+  "name": "Weather Greeting Workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "weather-greeting",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -320,
+        -64
+      ],
+      "id": "5fa8669c-a19c-4acb-b6d3-928294c94711",
+      "name": "Webhook",
+      "webhookId": "3c3dd4e8-a7cc-4467-be7a-a684a405fd96"
+    },
+    {
+      "parameters": {
+        "url": "=https://wttr.in/{{ encodeURIComponent($json.body.city) }}?format=%C+%t",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -96,
+        -64
+      ],
+      "id": "91f67daf-1785-42e3-92e7-b4057888f35a",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "respondWith": "allIncomingItems",
+        "options": {
+          "responseCode": 200
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        352,
+        -64
+      ],
+      "id": "2443724d-6b8a-48df-97d9-5a3a57f65f27",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get the name from the original webhook data\nconst name = $('Webhook').first().json.body.name;\n\n// Get the city from the original webhook data  \nconst city = $('Webhook').first().json.body.city;\n\n// Get the weather JSON response from HTTP Request\nconst weatherData = $input.first().json.data\n\n// Create our formatted greeting message\nconst greeting = `Hello ${name}, the weather in ${city} is currently ${weatherData}`;\n\n// Return the result\nreturn [{\n  json: {\n    message: greeting\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        128,
+        -64
+      ],
+      "id": "f3f576be-f0d6-47d4-ac10-f6c72994b326",
+      "name": "Code in JavaScript"
+    }
+  ],
+  "pinData": {
+    "Webhook": [
+      {
+        "json": {
+          "headers": {
+            "host": "n8n.marcvelous.com",
+            "user-agent": "PostmanRuntime/7.51.0",
+            "content-length": "50",
+            "accept": "*/*",
+            "accept-encoding": "gzip, deflate, br",
+            "content-type": "application/json",
+            "postman-token": "cbfd4842-d07e-4b86-93be-3cefdbbf9127",
+            "via": "1.1 Caddy",
+            "x-forwarded-for": "210.23.167.189",
+            "x-forwarded-host": "n8n.marcvelous.com",
+            "x-forwarded-proto": "https"
+          },
+          "params": {},
+          "query": {},
+          "body": {
+            "name": "Marc",
+            "city": "Manila"
+          },
+          "webhookUrl": "https://n8n.marcvelous.com/webhook/weather-greeting",
+          "executionMode": "production"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "timeSavedMode": "fixed",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false,
+    "errorWorkflow": "auAjbEkSw18iSlH6"
+  },
+  "versionId": "5cb82f63-8393-487f-8c58-f95ab454ecc4",
+  "meta": {
+    "instanceId": "bc1aa563941d8e885253e146372b9854dadbf07423a113cb2a17857592a56d1f"
+  },
+  "id": "NWwzjX2m3bqsBSBR",
+  "tags": []
+}
