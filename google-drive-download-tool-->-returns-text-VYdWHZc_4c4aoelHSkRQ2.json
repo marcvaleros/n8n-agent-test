@@ -1,0 +1,228 @@
+{
+  "updatedAt": "2026-02-06T17:13:25.885Z",
+  "createdAt": "2026-02-04T13:48:24.508Z",
+  "id": "VYdWHZc_4c4aoelHSkRQ2",
+  "name": "Google Drive Download Tool -> Returns Text",
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "file_id"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -288,
+        -16
+      ],
+      "id": "cb5aef7d-8195-42e4-9d53-b08208316bb9",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $json.file_id }}",
+          "mode": "id"
+        },
+        "options": {
+          "googleFileConversion": {
+            "conversion": {
+              "docsToFormat": "text/plain"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        -32,
+        -16
+      ],
+      "id": "3a617b19-f329-48d8-828e-ca0036ec5bc6",
+      "name": "Download file",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "Qv2z7eIU19fBjwQ8",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "text",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1.1,
+      "position": [
+        208,
+        -16
+      ],
+      "id": "2f406a4e-d593-4084-a44f-793af5d5e89f",
+      "name": "Extract from File"
+    }
+  ],
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Download file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download file": {
+      "main": [
+        [
+          {
+            "node": "Extract from File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {
+    "When Executed by Another Workflow": [
+      {
+        "json": {
+          "file_id": "1QPGgHuXkpOvtJKYgISQRJwsSTh8BOb_pWvtAg-MGeeU"
+        }
+      }
+    ]
+  },
+  "versionId": "2613a23c-017d-4c2f-8285-c5295c8ac3ad",
+  "activeVersionId": "2613a23c-017d-4c2f-8285-c5295c8ac3ad",
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-02-04T13:48:24.515Z",
+      "createdAt": "2026-02-04T13:48:24.515Z",
+      "role": "workflow:owner",
+      "workflowId": "VYdWHZc_4c4aoelHSkRQ2",
+      "projectId": "lco5eT8ukkxUOPne"
+    }
+  ],
+  "activeVersion": {
+    "updatedAt": "2026-02-04T13:51:30.000Z",
+    "createdAt": "2026-02-04T13:51:25.824Z",
+    "versionId": "2613a23c-017d-4c2f-8285-c5295c8ac3ad",
+    "workflowId": "VYdWHZc_4c4aoelHSkRQ2",
+    "nodes": [
+      {
+        "parameters": {
+          "workflowInputs": {
+            "values": [
+              {
+                "name": "file_id"
+              }
+            ]
+          }
+        },
+        "type": "n8n-nodes-base.executeWorkflowTrigger",
+        "typeVersion": 1.1,
+        "position": [
+          -288,
+          -16
+        ],
+        "id": "cb5aef7d-8195-42e4-9d53-b08208316bb9",
+        "name": "When Executed by Another Workflow"
+      },
+      {
+        "parameters": {
+          "operation": "download",
+          "fileId": {
+            "__rl": true,
+            "value": "={{ $json.file_id }}",
+            "mode": "id"
+          },
+          "options": {
+            "googleFileConversion": {
+              "conversion": {
+                "docsToFormat": "text/plain"
+              }
+            }
+          }
+        },
+        "type": "n8n-nodes-base.googleDrive",
+        "typeVersion": 3,
+        "position": [
+          -32,
+          -16
+        ],
+        "id": "3a617b19-f329-48d8-828e-ca0036ec5bc6",
+        "name": "Download file",
+        "credentials": {
+          "googleDriveOAuth2Api": {
+            "id": "Qv2z7eIU19fBjwQ8",
+            "name": "Google Drive account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "operation": "text",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.extractFromFile",
+        "typeVersion": 1.1,
+        "position": [
+          208,
+          -16
+        ],
+        "id": "2f406a4e-d593-4084-a44f-793af5d5e89f",
+        "name": "Extract from File"
+      }
+    ],
+    "connections": {
+      "When Executed by Another Workflow": {
+        "main": [
+          [
+            {
+              "node": "Download file",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Download file": {
+        "main": [
+          [
+            {
+              "node": "Extract from File",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "Joshua Grover",
+    "name": "Version 2613a23c",
+    "description": "",
+    "autosaved": true
+  },
+  "tags": []
+}
