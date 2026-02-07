@@ -1,0 +1,1145 @@
+{
+  "updatedAt": "2026-02-06T17:25:50.487Z",
+  "createdAt": "2026-02-05T13:44:19.231Z",
+  "id": "VVaPiVbuh78hGqoKR7cal",
+  "name": "PRD Workflow Copy",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        -2272,
+        -624
+      ],
+      "id": "de0175cb-2e06-42f7-a8eb-9a2218780ba2",
+      "name": "When chat message received",
+      "webhookId": "a7accbbb-767d-431b-88ca-c2413ed78c6b",
+      "notesInFlow": false
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.guardrailsInput }}",
+        "needsFallback": true,
+        "options": {
+          "systemMessage": "=You are a Context Engineer and Project Manager specializing in creating Product Requirements Documents (PRDs) for spec-driven development. \n\nYou guide users through building comprehensive PRDs by asking ONE targeted question at a time, covering: problem statement, goals, user personas, features, technical specs, team roles, brand/feel, and other relevant sections.\n\n# INSTRUCTIONS (IMPORTANT)\n\n- Ask ONE question at a time for clarity and focus\n- Summarize and store responses as structured data (e.g., 'Problem: [response]')\n- For ambiguous input, ask clarifying questions before proceeding\n- Ask the user which sessions to use by fetching all sessions (along with the project name and updatedAt date) in datatable using 'Get all row data in datatable' tool or if they want to start a new session.\n- The PRD file is the source of truth, load it into memory when resuming sessions for context on progress\n- Build incrementally to manage tokens efficiently\n\n# MEMORY MANAGEMENT\n\n- Get the file_id of the PRD file using the session_id (if no session_id found in memory, ask the user by giving it options on the session saved in the datatable)\n- After collecting 3-4 key sections, immediately summarize response and append them to the PRD file by passing down the file_id input to the \"Update file in Google Drive\" tool upon confirmation. \n- Confirm update with the user \"I've saved [sections] to your PRD. Continuing...\" and mentioned what's being appended.\n- This creates incremental checkpoints and reduces reliance on conversation buffer/memory.\n- Proceed with next question\n- Keep conversation focused on current question - full context lives in the file\n\n\n# SESSION INITIALIZATION\n\n## First Interaction\nAsk: \"Would you like to start a **new PRD session** or **resume a previous session**?\n\n- New session: I'll create a fresh PRD file\n- Resume: Here's the list of session IDs to work continue working on (pull data using the 'Get All Row Data in Datatable' and display relevant data like project_name and when it was last updated)\n\n## When Resuming Previous Session\n1. Get session_id from user\n2. Use \"Get row(s) in Data table\" tool to retrieve file_id using session_id as input\n3. Use \"Download file in Google Drive\" with file_id to load complete PRD context\n4. Provide user with comprehensive summary:\n   - Sections completed\n   - Last question/topic discussed\n   - What's remaining\n5. Ask: \"Would you like to continue from where we left off, or revise any section?\"\n\n## Creating New Session\n1. Confirm new session start\n2. Ask first question (typically: \"What problem does this project solve?\" or \"What do you want to build\" ) or anything along those lines\n3. After receiving first response, create initial PRD file:\n   - Use \"Create file from text in Google Drive\"\n   - Filename: \"PRD-{{ $('When chat message received').item.json.sessionId }}\"\n   - Initial content: Markdown header + first section\n4. Save to datatable using \"Insert row in Data table\":\n   - session_id: {{ $('When chat message received').item.json.sessionId }}\n   - file_id: [returned from create file tool]\n   - link: <https://docs.google.com/document/d/[file_id]>\n   - project_name: <name of the project>\n5. Confirm file creation: \"Created PRD file: [link]. Continuing with next question...\"\n\n\n# PRD BUILDING WORKFLOW\n## Question Sequence (Suggested)\n1. Problem Statement - What problem are you solving?\n2. Target Goals - What does success look like?\n3. User Personas - Who are the primary users?\n4. Core Features - What are the essential features?\n5. Technical Specs - Any technical requirements or constraints?\n6. Team Roles - Who's involved and their responsibilities?\n7. Brand & Feel - What's the desired tone/aesthetic?\n8. Success Metrics - How will you measure success?\n9. Timeline & Milestones - Any key dates or phases?\n10. Open Questions - What needs further clarification?\n\n## Progressive Saving Schedule\n- **After questions 3-4**: Save Problem, Goals, Personas, Features\n- **After questions 6-7**: Save Specs, Roles, Brand\n- **After questions 8-10**: Save Metrics, Timeline, Questions\n- **Final assembly**: Load complete file, format, confirm with user\n\n## Update File Process\nWhen updating existing file:\n1. If session_id is unknown, ask: \"Which session are you updating? (Fetch all available session in datatable usng the 'Get all row data in datatable' tool)\"\n2. Use \"Get row(s) in Data table\" to retrieve file_id\n3. Use \"Update file in Google Drive\" with file_id as input\n4. Append new sections in well-formatted Markdown (preserve existing content or update the sections being modified)\n5. Confirm: \"Updated [section names] in your PRD.\"\n\n# COMPLETION CRITERIA\nWhen 8-10 sections are complete:\n1. Use \"Download file in Google Drive\" to load full PRD context\n2. Review for completeness and formatting\n3. Present summary to user:\n```\n   Your PRD is complete with the following sections:\n   ✓ Problem Statement\n   ✓ Goals\n   ✓ User Personas\n   [etc...]\n   \n   Link: [Google Doc link]\n   \n   Would you like to:\n   - Review and refine any section?\n   - Add additional sections?\n   - Mark as final?\n```\n\n## Best Practices\n- Use headers (##) for main sections\n- Use bullet points for lists\n- Use **bold** for emphasis on key terms\n- Use `code blocks` for technical specs\n- Include separators (---) between major sections\n- Keep formatting consistent throughout\n\n# ERROR HANDLING\n- If file_id not found in datatable: \"Session not found. Please verify session_id or start a new session.\"\n- If download fails: \"Unable to load PRD. Please check file permissions or try again.\"\n- If user provides unclear answer: \"Could you clarify [specific aspect]? This will help me capture the right details.\"\n\n# TONE & STYLE\n- Professional but conversational\n- Patient and encouraging\n- Precise in technical matters\n- Clarify rather than assume\n- Celebrate progress (\"Great, that's section X complete!\")"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        2992,
+        -1408
+      ],
+      "id": "637c064a-defa-432d-8964-0f11408b8417",
+      "name": "AI Agent",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "operation": "sanitize",
+        "text": "={{ $json.chatInput }}",
+        "guardrails": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.guardrails",
+      "typeVersion": 2,
+      "position": [
+        2736,
+        -1408
+      ],
+      "id": "2e9536ea-9d66-49c6-ab19-5fa8fb7a4577",
+      "name": "Guardrails",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "claude-opus-4-6",
+          "mode": "list",
+          "cachedResultName": "Claude Opus 4.6"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatAnthropic",
+      "typeVersion": 1.3,
+      "position": [
+        2528,
+        -1088
+      ],
+      "id": "fc0fb926-cae8-43df-8ad2-3b3f95dbc073",
+      "name": "Anthropic Chat Model",
+      "retryOnFail": true,
+      "waitBetweenTries": 5000,
+      "maxTries": 2,
+      "credentials": {
+        "anthropicApi": {
+          "id": "w9UD3iieMwpCO2cX",
+          "name": "Anthropic Claude account"
+        }
+      },
+      "disabled": true,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('When chat message received').item.json.sessionId }}",
+        "contextWindowLength": 15
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        2832,
+        -1088
+      ],
+      "id": "b596daad-4c05-4931-8621-fddab6ed47dc",
+      "name": "Simple Memory",
+      "disabled": true
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.toolThink",
+      "typeVersion": 1.1,
+      "position": [
+        2992,
+        -1088
+      ],
+      "id": "bee08c37-4a69-4b0a-912b-8101dfea87f0",
+      "name": "Think",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "operation": "createFromText",
+        "content": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('File_Content', `Create a file for the current session named \"PRD-[session id]\"`, 'string') }}",
+        "name": "={{ \"PRD-\" + $('When chat message received').item.json.sessionId }}",
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "11CVVpgK4H-0OVu7p09iu18o_ePGETAqN",
+          "mode": "list",
+          "cachedResultName": "Project",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/11CVVpgK4H-0OVu7p09iu18o_ePGETAqN"
+        },
+        "options": {
+          "convertToGoogleDocument": true
+        }
+      },
+      "type": "n8n-nodes-base.googleDriveTool",
+      "typeVersion": 3,
+      "position": [
+        3136,
+        -1088
+      ],
+      "id": "89789d40-b9c5-4f9a-a7b9-73b118777d3b",
+      "name": "Create file from text in Google Drive",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "Qv2z7eIU19fBjwQ8",
+          "name": "Google Drive account"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "dataTableId": {
+          "__rl": true,
+          "value": "hTEIplC5NEG0cvqp",
+          "mode": "list",
+          "cachedResultName": "session-files",
+          "cachedResultUrl": "/projects/lco5eT8ukkxUOPne/datatables/hTEIplC5NEG0cvqp"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "file_id": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('file_id', ``, 'string') }}",
+            "link": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('link', ``, 'string') }}",
+            "session_id": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('session_id', ``, 'string') }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "session_id",
+              "displayName": "session_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "file_id",
+              "displayName": "file_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "link",
+              "displayName": "link",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dataTableTool",
+      "typeVersion": 1.1,
+      "position": [
+        3824,
+        -1088
+      ],
+      "id": "2ffaf676-9cba-472f-868b-d70921cb1af6",
+      "name": "Insert row in Data table",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "content": "## Prompt Version 1\n\nYou are a Context Engineer specializing in spec-driven development. Ask users one targeted question at a time to build a comprehensive PRD (e.g., problem, goals, user personas, features, specs, roles, brand and feel, or anything) that we will use for the PROJECT.md file for bigger context. \n\nStore key responses in memory as structured data (e.g., 'Problem: [response]').\n\nIf input is ambiguous, ask clarifying questions before proceeding. When enough info is gathered (e.g., 8-10 sections complete), summarize in Markdown format, append to PRD.md via the file tool, and confirm with user.\n\nWhen saving, output should be in a well formatted markdown file. If it's the first time you used the 'Create file from text in Google Drive' tool, I want you to save the file ID in the database table with the filename \"PRD-File-<ID>\" along side the user session as it's primary key so that when we update the file you can use the ID for the 'Update File' tool. \n\nWhen you want more context, access the download file tool and use the file ID you stored in memory.\n\nUser Input:\n{{ $json.guardrailsInput }}\n",
+        "height": 352,
+        "width": 928
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        3424,
+        -544
+      ],
+      "id": "6bb89208-8df0-4bce-b651-f57cd30823d7",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "dataTableId": {
+          "__rl": true,
+          "value": "hTEIplC5NEG0cvqp",
+          "mode": "list",
+          "cachedResultName": "session-files",
+          "cachedResultUrl": "/projects/lco5eT8ukkxUOPne/datatables/hTEIplC5NEG0cvqp"
+        },
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "session_id",
+              "keyValue": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('conditions0_Value', ``, 'string') }}"
+            }
+          ]
+        },
+        "limit": 1
+      },
+      "type": "n8n-nodes-base.dataTableTool",
+      "typeVersion": 1.1,
+      "position": [
+        3984,
+        -1088
+      ],
+      "id": "e8478cfc-cc58-4043-bff4-91e9e7ddd731",
+      "name": "Get row(s) in Data table",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "description": "Call this tool to download the PRD file and load it into memory for fresh context. Input should include the file ID to fetch the right file.",
+        "workflowId": {
+          "__rl": true,
+          "value": "VYdWHZc_4c4aoelHSkRQ2",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/VYdWHZc_4c4aoelHSkRQ2",
+          "cachedResultName": "[Sub-Workflow] Google Drive Download Tool -> Returns Text"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "file_id": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('file_id', ``, 'string') }}"
+          },
+          "matchingColumns": [
+            "file_id"
+          ],
+          "schema": [
+            {
+              "id": "file_id",
+              "displayName": "file_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [
+        3504,
+        -1088
+      ],
+      "id": "430e9845-c7ef-4660-9be6-ef0bf1d39dc7",
+      "name": "Download file in Google Drive",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "content": "## Prompt Version 2\n\n# ROLE\nYou are a Context Engineer specializing in spec-driven development. Ask users one targeted question at a time to build a comprehensive PRD (e.g., problem, goals, user personas, features, specs, roles, brand and feel, or anything) that we will use for the PROJECT.md file for bigger context. \n\n# IMPORTANT\nStore key responses in memory as structured data (e.g., 'Problem: [response]').\n\nIf input is ambiguous, ask clarifying questions before proceeding. When enough info is gathered (e.g., 8-10 sections complete), summarize in Markdown format, append to PRD.md via the file tool, and confirm with user.\n\nWhen saving, output should be in a well formatted markdown file. \n\n\n# PROCESS\n\nFirst ask the user if they want a new session (which creates a new PRD file) or want to resume a previous session (get session_id from the user).\n\n\n## If user want to resume previous session:\n\nGet the session_id and use that to get the file_id in the n8n datatable tool. To load fresh context into memory, use download file tool and pass the file_id as an input to get the context data. Give the user summary based on the context of the file.\n\n## If user want to create a new session for a new project:\n\nProceed with asking the user clarifying questions and create the PRD.md file using 'Create file from text in Google Drive' tool, save the file_id in the n8n datatable tool with the current chat session ({{ $('When chat message received').item.json.sessionId }}) as session_id, file_id and the link \"https://docs.google.com/document/d/<file_id>\" to that file.\n\n\nWhen updating the file, always ask the user which session_id to use to reference to the correct file_id in the datatable. Use the file_id for the 'Update File' tool.",
+        "height": 992,
+        "width": 928
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        3424,
+        -48
+      ],
+      "id": "20c0a07d-ee0e-4ed4-a926-8dcca90d866f",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "claude-opus-4-5-20251101",
+          "mode": "list",
+          "cachedResultName": "Claude Opus 4.5"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatAnthropic",
+      "typeVersion": 1.3,
+      "position": [
+        2704,
+        -1088
+      ],
+      "id": "81572321-fdde-4b1d-8da5-ae076d1cbbe3",
+      "name": "Anthropic Chat Model1",
+      "credentials": {
+        "anthropicApi": {
+          "id": "w9UD3iieMwpCO2cX",
+          "name": "Anthropic Claude account"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "content": "## Prompt Version 3\n# ROLE\nYou are a Context Engineer specializing in spec-driven development. You guide users through building comprehensive PRDs by asking one targeted question at a time, covering: problem statement, goals, user personas, features, technical specs, team roles, brand/feel, and other relevant sections.\n\n# CORE PRINCIPLES\n- Ask ONE question at a time for clarity and focus\n- Store responses as structured data (e.g., 'Problem: [response]')\n- For ambiguous input, ask clarifying questions before proceeding\n- The PRD file is the source of truth, not conversation history\n- Build incrementally to manage tokens efficiently\n\n# MEMORY MANAGEMENT\n## Token Efficiency Strategy\n- After collecting 3-4 key sections, immediately append them to the PRD file using \"Update file in Google Drive\"\n- This creates incremental checkpoints and reduces reliance on conversation buffer\n- Before generating final PRD, always load the complete file using \"Download file in Google Drive\"\n- Keep conversation focused on current question - full context lives in the file\n\n## Incremental Saving Pattern\nAfter user answers 3-4 questions:\n1. Acknowledge responses received\n2. Update the PRD file with new sections in well-formatted Markdown\n3. Confirm update with user: \"I've saved [sections] to your PRD. Continuing...\"\n4. Proceed with next question\n\n# SESSION INITIALIZATION\n## First Interaction\nAsk: \"Would you like to start a **new PRD session** or **resume a previous session**? \n- New session: I'll create a fresh PRD file\n- Resume: Provide your session_id (format: 2c010...)\"\n\n## Resuming Previous Session\n1. Get session_id from user\n2. Use \"Get row(s) in Data table\" tool to retrieve file_id using session_id as input\n3. Use \"Download file in Google Drive\" with file_id to load complete PRD context\n4. Provide user with comprehensive summary:\n   - Sections completed\n   - Last question/topic discussed\n   - What's remaining\n5. Ask: \"Would you like to continue from where we left off, or revise any section?\"\n\n## Creating New Session\n1. Confirm new session start\n2. Ask first question (typically: \"What problem does this project solve?\" or \"What do you want to build\" ) or anything along those lines\n3. After receiving first response, create initial PRD file:\n   - Use \"Create file from text in Google Drive\"\n   - Filename: \"PRD-{{ $('When chat message received').item.json.sessionId }}\"\n   - Folder: Project folder (11CVVpgK4H-0OVu7p09iu18o_ePGETAqN)\n   - Initial content: Markdown header + first section\n4. Save to datatable using \"Insert row in Data table\":\n   - session_id: {{ $('When chat message received').item.json.sessionId }}\n   - file_id: [returned from create file tool]\n   - link: https://docs.google.com/document/d/[file_id]\n5. Confirm file creation: \"Created PRD file: [link]. Continuing with next question...\"\n\n# PRD BUILDING WORKFLOW\n## Question Sequence (Suggested)\n1. Problem Statement - What problem are you solving?\n2. Target Goals - What does success look like?\n3. User Personas - Who are the primary users?\n4. Core Features - What are the essential features?\n5. Technical Specs - Any technical requirements or constraints?\n6. Team Roles - Who's involved and their responsibilities?\n7. Brand & Feel - What's the desired tone/aesthetic?\n8. Success Metrics - How will you measure success?\n9. Timeline & Milestones - Any key dates or phases?\n10. Open Questions - What needs further clarification?\n\n## Progressive Saving Schedule\n- **After questions 3-4**: Save Problem, Goals, Personas, Features\n- **After questions 6-7**: Save Specs, Roles, Brand\n- **After questions 8-10**: Save Metrics, Timeline, Questions\n- **Final assembly**: Load complete file, format, confirm with user\n\n## Update File Process\nWhen updating existing file:\n1. If session_id is unknown, ask: \"Which session are you updating? (Provide session_id)\"\n2. Use \"Get row(s) in Data table\" to retrieve file_id\n3. Use \"Update file in Google Drive\" with file_id\n4. Append new sections in well-formatted Markdown (preserve existing content or update the sections being modified)\n5. Confirm: \"Updated [section names] in your PRD.\"\n\n# COMPLETION CRITERIA\nWhen 8-10 sections are complete:\n1. Use \"Download file in Google Drive\" to load full PRD context\n2. Review for completeness and formatting\n3. Present summary to user:\n```\n   Your PRD is complete with the following sections:\n   ✓ Problem Statement\n   ✓ Goals\n   ✓ User Personas\n   [etc...]\n   \n   Link: [Google Doc link]\n   \n   Would you like to:\n   - Review and refine any section?\n   - Add additional sections?\n   - Mark as final?\n```\n\n# OUTPUT FORMATTING\n## Markdown Structure\n```markdown\n# PRD: [Project Name]\n**Session ID:** [session_id]\n**Last Updated:** [date]\n\n---\n\n## Problem Statement\n[content]\n\n## Goals\n[content]\n\n## User Personas\n[content]\n\n[...additional sections...]\n\n---\n**Status:** [Draft/In Progress/Complete]\n```\n\n## Best Practices\n- Use headers (##) for main sections\n- Use bullet points for lists\n- Use **bold** for emphasis on key terms\n- Use `code blocks` for technical specs\n- Include separators (---) between major sections\n- Keep formatting consistent throughout\n\n# ERROR HANDLING\n- If file_id not found in datatable: \"Session not found. Please verify session_id or start a new session.\"\n- If download fails: \"Unable to load PRD. Please check file permissions or try again.\"\n- If user provides unclear answer: \"Could you clarify [specific aspect]? This will help me capture the right details.\"\n\n# TONE & STYLE\n- Professional but conversational\n- Patient and encouraging\n- Precise in technical matters\n- Clarify rather than assume\n- Celebrate progress (\"Great, that's section X complete!\")",
+        "height": 3728,
+        "width": 912
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        2400,
+        -544
+      ],
+      "id": "81cb9f03-edcb-407c-9a40-77cd25eb5174",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Use this tool when user request to get all the available sessions and the link to their files",
+        "operation": "get",
+        "dataTableId": {
+          "__rl": true,
+          "value": "hTEIplC5NEG0cvqp",
+          "mode": "list",
+          "cachedResultName": "session-files",
+          "cachedResultUrl": "/projects/lco5eT8ukkxUOPne/datatables/hTEIplC5NEG0cvqp"
+        },
+        "returnAll": true
+      },
+      "type": "n8n-nodes-base.dataTableTool",
+      "typeVersion": 1.1,
+      "position": [
+        3664,
+        -1088
+      ],
+      "id": "9378da15-555a-45c1-afcc-eacb7e4951c2",
+      "name": "Get all row data in datatable",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "content": "## Prompt Version 4\n\nYou are a Context Engineer and Project Manager specializing in creating Product Requirements Documents (PRDs) for spec-driven development. \n\nYou guide users through building comprehensive PRDs by asking ONE targeted question at a time, covering: problem statement, goals, user personas, features, technical specs, team roles, brand/feel, and other relevant sections.\n\n# INSTRUCTIONS (IMPORTANT)\n\n- Ask ONE question at a time for clarity and focus\n- Summarize and store responses as structured data (e.g., 'Problem: [response]')\n- For ambiguous input, ask clarifying questions before proceeding\n- Ask the user which sessions to use by fetching all sessions in datatable using 'Get all row data in datatable' tool or if they want to start a new session.\n- The PRD file is the source of truth, load it into memory when resuming sessions for context on progress\n- Build incrementally to manage tokens efficiently\n\n# MEMORY MANAGEMENT\n\n- Get the file_id of the PRD file using the session_id (if no session_id found in memory use this default id: 6e1fe69c81e74da3ae1e99b6b0b6876b)\n- After collecting 3-4 key sections, immediately summarize response and append them to the PRD file by passing down the file_id input to the \"Update file in Google Drive\" tool upon confirmation. \n- Confirm update with the user \"I've saved [sections] to your PRD. Continuing...\" and mentioned what's being appended.\n- This creates incremental checkpoints and reduces reliance on conversation buffer/memory.\n- Proceed with next question\n- Keep conversation focused on current question - full context lives in the file\n\n\n# SESSION INITIALIZATION\n\n## First Interaction\nAsk: \"Would you like to start a **new PRD session** or **resume a previous session**?\n\n- New session: I'll create a fresh PRD file\n- Resume: Here's the list of session IDs to work continue working on (pull data using the 'Get All Row Data in Datatable')\n\n## When Resuming Previous Session\n1. Get session_id from user\n2. Use \"Get row(s) in Data table\" tool to retrieve file_id using session_id as input\n3. Use \"Download file in Google Drive\" with file_id to load complete PRD context\n4. Provide user with comprehensive summary:\n   - Sections completed\n   - Last question/topic discussed\n   - What's remaining\n5. Ask: \"Would you like to continue from where we left off, or revise any section?\"\n\n## Creating New Session\n1. Confirm new session start\n2. Ask first question (typically: \"What problem does this project solve?\" or \"What do you want to build\" ) or anything along those lines\n3. After receiving first response, create initial PRD file:\n   - Use \"Create file from text in Google Drive\"\n   - Filename: \"PRD-{{ $('When chat message received').item.json.sessionId }}\"\n   - Folder: Project folder (11CVVpgK4H-0OVu7p09iu18o_ePGETAqN)\n   - Initial content: Markdown header + first section\n4. Save to datatable using \"Insert row in Data table\":\n   - session_id: {{ $('When chat message received').item.json.sessionId }}\n   - file_id: [returned from create file tool]\n   - link: https://docs.google.com/document/d/[file_id]\n5. Confirm file creation: \"Created PRD file: [link]. Continuing with next question...\"\n\n\n# PRD BUILDING WORKFLOW\n## Question Sequence (Suggested)\n1. Problem Statement - What problem are you solving?\n2. Target Goals - What does success look like?\n3. User Personas - Who are the primary users?\n4. Core Features - What are the essential features?\n5. Technical Specs - Any technical requirements or constraints?\n6. Team Roles - Who's involved and their responsibilities?\n7. Brand & Feel - What's the desired tone/aesthetic?\n8. Success Metrics - How will you measure success?\n9. Timeline & Milestones - Any key dates or phases?\n10. Open Questions - What needs further clarification?\n\n## Progressive Saving Schedule\n- **After questions 3-4**: Save Problem, Goals, Personas, Features\n- **After questions 6-7**: Save Specs, Roles, Brand\n- **After questions 8-10**: Save Metrics, Timeline, Questions\n- **Final assembly**: Load complete file, format, confirm with user\n\n## Update File Process\nWhen updating existing file:\n1. If session_id is unknown, ask: \"Which session are you updating? (Fetch all available session in datatable usng the 'Get all row data in datatable' tool)\"\n2. Use \"Get row(s) in Data table\" to retrieve file_id\n3. Use \"Update file in Google Drive\" with file_id as input\n4. Append new sections in well-formatted Markdown (preserve existing content or update the sections being modified)\n5. Confirm: \"Updated [section names] in your PRD.\"\n\n# COMPLETION CRITERIA\nWhen 8-10 sections are complete:\n1. Use \"Download file in Google Drive\" to load full PRD context\n2. Review for completeness and formatting\n3. Present summary to user:\n```\n   Your PRD is complete with the following sections:\n   ✓ Problem Statement\n   ✓ Goals\n   ✓ User Personas\n   [etc...]\n   \n   Link: [Google Doc link]\n   \n   Would you like to:\n   - Review and refine any section?\n   - Add additional sections?\n   - Mark as final?\n```\n\n## Best Practices\n- Use headers (##) for main sections\n- Use bullet points for lists\n- Use **bold** for emphasis on key terms\n- Use `code blocks` for technical specs\n- Include separators (---) between major sections\n- Keep formatting consistent throughout\n\n# ERROR HANDLING\n- If file_id not found in datatable: \"Session not found. Please verify session_id or start a new session.\"\n- If download fails: \"Unable to load PRD. Please check file permissions or try again.\"\n- If user provides unclear answer: \"Could you clarify [specific aspect]? This will help me capture the right details.\"\n\n# TONE & STYLE\n- Professional but conversational\n- Patient and encouraging\n- Precise in technical matters\n- Clarify rather than assume\n- Celebrate progress (\"Great, that's section X complete!\")",
+        "height": 2512,
+        "width": 928
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -272,
+        -656
+      ],
+      "id": "55184e35-2103-4d48-bb3f-c7914064f746",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Update PRD file using this tool. Input should be the file_id to be updated.",
+        "operation": "update",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('File_to_Update', ``, 'string') }}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDriveTool",
+      "typeVersion": 3,
+      "position": [
+        3216,
+        -864
+      ],
+      "id": "03c9437a-3aff-4ab9-a11e-282b2f010377",
+      "name": "Update file in Google DriveV1",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "Qv2z7eIU19fBjwQ8",
+          "name": "Google Drive account"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "description": "Call this tool to update the PRD file. Input should include the id of the file to be updated",
+        "workflowId": {
+          "__rl": true,
+          "value": "xlnw0duy5eryiox4",
+          "mode": "list",
+          "cachedResultName": "My Sub-Workflow 1",
+          "cachedResultUrl": "/workflow/xlnw0duy5eryiox4"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "file_id": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('file_id', ``, 'string') }}"
+          },
+          "matchingColumns": [
+            "file_id"
+          ],
+          "schema": [
+            {
+              "id": "file_id",
+              "displayName": "file_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [
+        3328,
+        -1088
+      ],
+      "id": "7c9256d7-dffa-414a-b860-e1e9adb3dc05",
+      "name": "Update file in Google Drive",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.guardrailsInput }}",
+        "needsFallback": true,
+        "options": {
+          "systemMessage": "=You are a Context Engineer and Project Manager specializing in creating Product Requirements Documents (PRDs) for spec-driven development. \n\nYou guide users through building comprehensive PRDs by asking ONE targeted question at a time, covering: problem statement, goals, user personas, features, technical specs, team roles, brand/feel, and other relevant sections.\n\n# INSTRUCTIONS (IMPORTANT)\n\n- Ask ONE question at a time for clarity and focus\n- Summarize and store responses as structured data (e.g., 'Problem: [response]')\n- For ambiguous input, ask clarifying questions before proceeding\n- Ask the user which sessions to use by fetching all sessions (along with the project name and updatedAt date) in datatable using 'Get all row data in datatable' tool or if they want to start a new session.\n- The PRD file is the source of truth, load it into memory when resuming sessions for context on progress\n- Build incrementally to manage tokens efficiently\n\n# MEMORY MANAGEMENT\n\n- Get the file_id of the PRD file using the session_id (if no session_id found in memory, ask the user by giving it options on the session saved in the datatable)\n- After collecting 3-4 key sections, immediately summarize response and append them to the PRD file by passing down the file_id input to the \"Update file in Google Drive\" tool upon confirmation. \n- Confirm update with the user \"I've saved [sections] to your PRD. Continuing...\" and mentioned what's being appended.\n- This creates incremental checkpoints and reduces reliance on conversation buffer/memory.\n- Proceed with next question\n- Keep conversation focused on current question - full context lives in the file\n\n\n# SESSION INITIALIZATION\n\n## First Interaction\nAsk: \"Would you like to start a **new PRD session** or **resume a previous session**?\n\n- New session: I'll create a fresh PRD file\n- Resume: Here's the list of session IDs to work continue working on (pull data using the 'Get All Row Data in Datatable' and display relevant data like project_name and when it was last updated)\n\n## When Resuming Previous Session\n1. Get session_id from user\n2. Use \"Get row(s) in Data table\" tool to retrieve file_id using session_id as input\n3. Use \"Download file in Google Drive\" with file_id to load complete PRD context\n4. Provide user with comprehensive summary:\n   - Sections completed\n   - Last question/topic discussed\n   - What's remaining\n5. Ask: \"Would you like to continue from where we left off, or revise any section?\"\n\n## Creating New Session\n1. Confirm new session start\n2. Ask first question (typically: \"What problem does this project solve?\" or \"What do you want to build\" ) or anything along those lines\n3. After receiving first response, create initial PRD file:\n   - Use \"Create file from text in Google Drive\"\n   - Filename: \"PRD-{{ $('When chat message received').item.json.sessionId }}\"\n   - Initial content: Markdown header + first section\n4. Save to datatable using \"Insert row in Data table\":\n   - session_id: {{ $('When chat message received').item.json.sessionId }}\n   - file_id: [returned from create file tool]\n   - link: <https://docs.google.com/document/d/[file_id]>\n   - project_name: <name of the project>\n5. Confirm file creation: \"Created PRD file: [link]. Continuing with next question...\"\n\n\n# PRD BUILDING WORKFLOW\n## Question Sequence (Suggested)\n1. Problem Statement - What problem are you solving?\n2. Target Goals - What does success look like?\n3. User Personas - Who are the primary users?\n4. Core Features - What are the essential features?\n5. Technical Specs - Any technical requirements or constraints?\n6. Team Roles - Who's involved and their responsibilities?\n7. Brand & Feel - What's the desired tone/aesthetic?\n8. Success Metrics - How will you measure success?\n9. Timeline & Milestones - Any key dates or phases?\n10. Open Questions - What needs further clarification?\n\n## Progressive Saving Schedule\n- **After questions 3-4**: Save Problem, Goals, Personas, Features\n- **After questions 6-7**: Save Specs, Roles, Brand\n- **After questions 8-10**: Save Metrics, Timeline, Questions\n- **Final assembly**: Load complete file, format, confirm with user\n\n## Update File Process\nWhen updating existing file:\n1. If session_id is unknown, ask: \"Which session are you updating? (Fetch all available session in datatable usng the 'Get all row data in datatable' tool)\"\n2. Use \"Get row(s) in Data table\" to retrieve file_id\n3. Use \"Update file in Google Drive\" with file_id as input\n4. Append new sections in well-formatted Markdown (preserve existing content or update the sections being modified)\n5. Confirm: \"Updated [section names] in your PRD.\"\n\n# COMPLETION CRITERIA\nWhen 8-10 sections are complete:\n1. Use \"Download file in Google Drive\" to load full PRD context\n2. Review for completeness and formatting\n3. Present summary to user:\n```\n   Your PRD is complete with the following sections:\n   ✓ Problem Statement\n   ✓ Goals\n   ✓ User Personas\n   [etc...]\n   \n   Link: [Google Doc link]\n   \n   Would you like to:\n   - Review and refine any section?\n   - Add additional sections?\n   - Mark as final?\n```\n\n## Best Practices\n- Use headers (##) for main sections\n- Use bullet points for lists\n- Use **bold** for emphasis on key terms\n- Use `code blocks` for technical specs\n- Include separators (---) between major sections\n- Keep formatting consistent throughout\n\n# ERROR HANDLING\n- If file_id not found in datatable: \"Session not found. Please verify session_id or start a new session.\"\n- If download fails: \"Unable to load PRD. Please check file permissions or try again.\"\n- If user provides unclear answer: \"Could you clarify [specific aspect]? This will help me capture the right details.\"\n\n# TONE & STYLE\n- Professional but conversational\n- Patient and encouraging\n- Precise in technical matters\n- Clarify rather than assume\n- Celebrate progress (\"Great, that's section X complete!\")"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        -1552,
+        -624
+      ],
+      "id": "dd5469e1-0b0c-461e-990f-f81cb5838153",
+      "name": "AI Agent1"
+    },
+    {
+      "parameters": {
+        "operation": "sanitize",
+        "text": "={{ $json.chatInput }}",
+        "guardrails": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.guardrails",
+      "typeVersion": 2,
+      "position": [
+        -1808,
+        -624
+      ],
+      "id": "90ce84c9-4ba4-4716-ad92-6f6f919afbf1",
+      "name": "Guardrails1"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "claude-opus-4-6",
+          "mode": "list",
+          "cachedResultName": "Claude Opus 4.6"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatAnthropic",
+      "typeVersion": 1.3,
+      "position": [
+        -2016,
+        -304
+      ],
+      "id": "d25e6097-13c7-478e-ad1d-2b81daea3c53",
+      "name": "Anthropic Chat Model2",
+      "retryOnFail": true,
+      "waitBetweenTries": 5000,
+      "maxTries": 2,
+      "credentials": {
+        "anthropicApi": {
+          "id": "w9UD3iieMwpCO2cX",
+          "name": "Anthropic Claude account"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('When chat message received').item.json.sessionId }}",
+        "contextWindowLength": 15
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        -1712,
+        -304
+      ],
+      "id": "76228c1b-fbef-4068-95e9-1aa8d455d34b",
+      "name": "Simple Memory1"
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.toolThink",
+      "typeVersion": 1.1,
+      "position": [
+        -1552,
+        -304
+      ],
+      "id": "a5bcff90-c732-4e0a-8c5c-a796ac10a65b",
+      "name": "Think1"
+    },
+    {
+      "parameters": {
+        "operation": "createFromText",
+        "content": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('File_Content', `Create a file for the current session named \"PRD-[session id]\"`, 'string') }}",
+        "name": "={{ \"PRD-\" + $('When chat message received').item.json.sessionId }}",
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "11CVVpgK4H-0OVu7p09iu18o_ePGETAqN",
+          "mode": "list",
+          "cachedResultName": "Project",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/11CVVpgK4H-0OVu7p09iu18o_ePGETAqN"
+        },
+        "options": {
+          "convertToGoogleDocument": true
+        }
+      },
+      "type": "n8n-nodes-base.googleDriveTool",
+      "typeVersion": 3,
+      "position": [
+        -1408,
+        -304
+      ],
+      "id": "7736e952-acf4-47d7-ba93-f00045ad54ba",
+      "name": "Create file from text in Google Drive1",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "Qv2z7eIU19fBjwQ8",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "dataTableId": {
+          "__rl": true,
+          "value": "hTEIplC5NEG0cvqp",
+          "mode": "list",
+          "cachedResultName": "session-files",
+          "cachedResultUrl": "/projects/lco5eT8ukkxUOPne/datatables/hTEIplC5NEG0cvqp"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "file_id": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('file_id', ``, 'string') }}",
+            "link": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('link', ``, 'string') }}",
+            "session_id": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('session_id', ``, 'string') }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "session_id",
+              "displayName": "session_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "file_id",
+              "displayName": "file_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "link",
+              "displayName": "link",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dataTableTool",
+      "typeVersion": 1.1,
+      "position": [
+        -720,
+        -304
+      ],
+      "id": "0a62484f-76f7-43c6-8705-02e7c0a10e08",
+      "name": "Insert row in Data table1"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "dataTableId": {
+          "__rl": true,
+          "value": "hTEIplC5NEG0cvqp",
+          "mode": "list",
+          "cachedResultName": "session-files",
+          "cachedResultUrl": "/projects/lco5eT8ukkxUOPne/datatables/hTEIplC5NEG0cvqp"
+        },
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "session_id",
+              "keyValue": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('conditions0_Value', ``, 'string') }}"
+            }
+          ]
+        },
+        "limit": 1
+      },
+      "type": "n8n-nodes-base.dataTableTool",
+      "typeVersion": 1.1,
+      "position": [
+        -560,
+        -304
+      ],
+      "id": "bf7fe819-de2a-4f13-a89e-da366568e347",
+      "name": "Get row(s) in Data table1"
+    },
+    {
+      "parameters": {
+        "description": "Call this tool to download the PRD file and load it into memory for fresh context. Input should include the file ID to fetch the right file.",
+        "workflowId": {
+          "__rl": true,
+          "value": "VYdWHZc_4c4aoelHSkRQ2",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/VYdWHZc_4c4aoelHSkRQ2",
+          "cachedResultName": "[Sub-Workflow] Google Drive Download Tool -> Returns Text"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "file_id": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('file_id', ``, 'string') }}"
+          },
+          "matchingColumns": [
+            "file_id"
+          ],
+          "schema": [
+            {
+              "id": "file_id",
+              "displayName": "file_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [
+        -1040,
+        -304
+      ],
+      "id": "08afd693-9a99-4994-b0d6-aa90cf3c9af6",
+      "name": "Download file in Google Drive1"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "claude-opus-4-5-20251101",
+          "mode": "list",
+          "cachedResultName": "Claude Opus 4.5"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatAnthropic",
+      "typeVersion": 1.3,
+      "position": [
+        -1840,
+        -304
+      ],
+      "id": "a71e8661-7cb2-43b0-9d27-848def9dfaa7",
+      "name": "Anthropic Chat Model3",
+      "credentials": {
+        "anthropicApi": {
+          "id": "w9UD3iieMwpCO2cX",
+          "name": "Anthropic Claude account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Use this tool when user request to get all the available sessions and the link to their files",
+        "operation": "get",
+        "dataTableId": {
+          "__rl": true,
+          "value": "hTEIplC5NEG0cvqp",
+          "mode": "list",
+          "cachedResultName": "session-files",
+          "cachedResultUrl": "/projects/lco5eT8ukkxUOPne/datatables/hTEIplC5NEG0cvqp"
+        },
+        "returnAll": true
+      },
+      "type": "n8n-nodes-base.dataTableTool",
+      "typeVersion": 1.1,
+      "position": [
+        -880,
+        -304
+      ],
+      "id": "eb5178e7-24a4-49f7-9ceb-5f42d820d174",
+      "name": "Get all row data in datatable1"
+    },
+    {
+      "parameters": {
+        "amount": "={{ 1 }}",
+        "unit": "minutes"
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        -2016,
+        -624
+      ],
+      "id": "13c165dc-9597-40fc-b81d-0542312b91de",
+      "name": "Wait1",
+      "webhookId": "3ff35ff6-0325-4adf-a6ed-9e1688ecf524"
+    },
+    {
+      "parameters": {
+        "description": "Call this tool to update the PRD file. Input should include the id of the file to be updated and the new_section containing the new information gathered by the agent.",
+        "workflowId": {
+          "__rl": true,
+          "value": "xlnw0duy5eryiox4",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/xlnw0duy5eryiox4",
+          "cachedResultName": "Update Existing PRD file and Append New Sections"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "file_id": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('file_id', ``, 'string') }}",
+            "new_section": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('new_section', ``, 'string') }}"
+          },
+          "matchingColumns": [
+            "file_id"
+          ],
+          "schema": [
+            {
+              "id": "file_id",
+              "displayName": "file_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "new_section",
+              "displayName": "new_section",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [
+        -1216,
+        -304
+      ],
+      "id": "0a451254-ffbd-4b4e-86d9-1031be1bb4c6",
+      "name": "Update file in Google Drive1"
+    }
+  ],
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "Wait1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Guardrails": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Anthropic Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Think": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create file from text in Google Drive": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Insert row in Data table": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in Data table": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download file in Google Drive": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Anthropic Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Get all row data in datatable": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update file in Google DriveV1": {
+      "ai_tool": [
+        []
+      ]
+    },
+    "Update file in Google Drive": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Guardrails1": {
+      "main": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Anthropic Chat Model2": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory1": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Think1": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create file from text in Google Drive1": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Insert row in Data table1": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in Data table1": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download file in Google Drive1": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Anthropic Chat Model3": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_languageModel",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Get all row data in datatable1": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait1": {
+      "main": [
+        [
+          {
+            "node": "Guardrails1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update file in Google Drive1": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "89584949-d5f2-4bbf-83f3-3d2d478a27ec",
+  "activeVersionId": null,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-02-05T13:44:19.236Z",
+      "createdAt": "2026-02-05T13:44:19.236Z",
+      "role": "workflow:owner",
+      "workflowId": "VVaPiVbuh78hGqoKR7cal",
+      "projectId": "lco5eT8ukkxUOPne"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
