@@ -1,0 +1,583 @@
+{
+  "updatedAt": "2026-02-06T17:13:06.008Z",
+  "createdAt": "2026-02-06T16:30:01.175Z",
+  "id": "xlnw0duy5eryiox4",
+  "name": "Update Existing PRD file and Append New Sections",
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "file_id"
+            },
+            {
+              "name": "new_section"
+            }
+          ]
+        }
+      },
+      "id": "c055762a-8fe7-4141-a639-df2372f30060",
+      "typeVersion": 1.1,
+      "name": "When Executed by Another Workflow",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "position": [
+        272,
+        352
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $('When Executed by Another Workflow').item.json.file_id }}",
+          "mode": "id"
+        },
+        "changeFileContent": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        1536,
+        352
+      ],
+      "id": "3897e033-9e5c-4568-8212-51e1456b7cd4",
+      "name": "Update file",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "Qv2z7eIU19fBjwQ8",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "toText",
+        "sourceProperty": "output",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        1312,
+        352
+      ],
+      "id": "08c83f6a-9175-46dd-bdba-3cf54147f68c",
+      "name": "Convert to File"
+    },
+    {
+      "parameters": {
+        "content": "Download data first then have an AI agent append the new section to the PRD. Convert text data to binary to update the file content.",
+        "height": 80,
+        "width": 352
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        320,
+        560
+      ],
+      "id": "f17cdfb5-e4e0-499a-9e38-f275cc57f5e2",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $json.file_id }}",
+          "mode": "id"
+        },
+        "options": {
+          "googleFileConversion": {
+            "conversion": {
+              "docsToFormat": "text/plain"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        512,
+        352
+      ],
+      "id": "b1bfdace-0f44-4d4c-bc2b-d766b70f4846",
+      "name": "Download file",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "Qv2z7eIU19fBjwQ8",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "text",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1.1,
+      "position": [
+        720,
+        352
+      ],
+      "id": "2a8a7c9d-e93e-4a82-9148-71308c77d074",
+      "name": "Extract from File"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Can you add this new findings to the Main PRD file: {{ $('When Executed by Another Workflow').item.json.new_section }}.\n\nIf you encounter any error, the output should just be the content of the Main PRD file (don't add any comments):\n{{ $json.data }}\n\n\n",
+        "options": {
+          "systemMessage": "=You are a context engineer and a project manager specializing in creating comprehensive PRD for spec-driven development. You have access to the main PRD file content and I want you to append or update sections using the new text data from the user.\n\nOutput should be in a markdown format in text and make sure you preserve the structure of the PRD."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        944,
+        352
+      ],
+      "id": "b2fc7590-a4dc-47c2-99ec-5a447d495183",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "claude-opus-4-5-20251101",
+          "mode": "list",
+          "cachedResultName": "Claude Opus 4.5"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatAnthropic",
+      "typeVersion": 1.3,
+      "position": [
+        944,
+        576
+      ],
+      "id": "76d9bc87-0f4f-4b11-b005-a79ef804d1f2",
+      "name": "Anthropic Chat Model",
+      "credentials": {
+        "anthropicApi": {
+          "id": "w9UD3iieMwpCO2cX",
+          "name": "Anthropic Claude account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.toolThink",
+      "typeVersion": 1.1,
+      "position": [
+        1088,
+        576
+      ],
+      "id": "f63f6bab-ea8d-44f5-8d18-23aa737a0255",
+      "name": "Think"
+    }
+  ],
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Download file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update file": {
+      "main": [
+        []
+      ]
+    },
+    "Convert to File": {
+      "main": [
+        [
+          {
+            "node": "Update file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download file": {
+      "main": [
+        [
+          {
+            "node": "Extract from File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from File": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Anthropic Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Convert to File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Think": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {
+    "When Executed by Another Workflow": [
+      {
+        "json": {
+          "file_id": "14x69FBR6m_6Fyp89uccukrMPIOIZE33E6xdQy2y6kJE",
+          "new_section": "sitemap should have home and about button"
+        }
+      }
+    ],
+    "AI Agent": [
+      {
+        "json": {
+          "output": "# Product Requirements Document (PRD)\n## Clear Ocean Group Website Redesign\n\n\n**Document Version:** 1.0  \n**Last Updated:** 2024  \n**Project Owner:** Clear Ocean Group  \n**Platform:** Luxury Presence\n\n\n---\n\n\n## 1. Executive Summary\n\n\nClear Ocean Group is a luxury real estate brokerage in Dorado, Puerto Rico, specializing in $1M+ properties in and around Dorado Beach. This PRD outlines the complete redesign of their existing website (www.ClearOceanGroup.com) to address critical issues with SEO performance, LLM/AI search visibility, conversion rates, and competitive positioning. The target audience is Ultra High Net Worth (UHNW) families relocating to Dorado Beach to take advantage of Puerto Rico's Act 60 tax incentives.\n\n\n---\n\n\n## 2. Company Overview\n\n\n**Company Name:** Clear Ocean Group  \n**Industry:** Real estate brokerage  \n**Location:** Dorado, Puerto Rico  \n**Market Focus:** $1M+ luxury properties in and around Dorado Beach  \n**Target Client:** UHNW families relocating for Act 60 tax benefits  \n**Key Personnel:** Amanda Grover (Founder & Lead Agent)\n\n\n---\n\n\n## 3. Problem Statement\n\n\n### Current State Issues\n- **Existing website** (www.ClearOceanGroup.com) is outdated and buggy\n- **Poor SEO performance** - not ranking for target keywords\n- **Low LLM/AI search visibility** - not appearing in AI-powered search results\n- **Near-zero conversion rate** - visitors not converting to qualified leads\n- **Competitive disadvantage** - Competitor \"Island & Key\" capturing target demographic traffic\n\n\n### Business Impact\n- Missing high-value opportunities ($75k-$500k commission per transaction, avg ~$150k)\n- Losing market share to competitors\n- Inability to establish authority in the luxury Dorado Beach real estate market\n\n\n---\n\n\n## 4. Goals & Success Metrics\n\n\n### Primary Goals\n1. **Improve SEO Rankings** - Achieve #1 ranking for all 18 target neighborhoods/communities\n2. **Increase Lead Quality & Quantity** - Generate qualified UHNW leads\n3. **Boost Conversion Rates** - Improve from near-zero baseline\n4. **Outperform Competitors** - Capture traffic currently going to Island & Key\n5. **Establish Thought Leadership** - Position as trusted advisor for Act 60 relocations\n\n\n### Success Metrics (KPIs)\n- **ROI Benchmark:** 1 closed transaction = project success (avg $150k commission)\n- Number of qualified leads per month (baseline: near zero)\n- Conversion rate improvement (baseline: near zero)\n- Signed exclusive buyer agreements per quarter\n- SEO rankings for target keywords\n- Time on site and engagement metrics\n- Reduction in unqualified leads\n\n\n### SEO Target Rankings (#1 Position)\nRank #1 for the following 18 Dorado Beach neighborhoods/communities:\n1. Ritz-Carlton Reserve Residences\n2. La Cala\n3. Livingston Estates\n4. East Beach\n5. West Point\n6. West Beach\n7. Dorado Beach Estates\n8. Villa Dorado Estates\n9. Dorado Country Estates\n10. The Enclave\n11. Dorado Beach East\n12. The Isles\n13. Plantation Village\n14. Villa Dorado Condos\n15. The Greens\n16. The Fairways\n17. The Cottages\n18. Dorado Plantation\n\n\n**Additional keyword targets:**\n- \"Dorado Beach real estate\" and related terms\n- \"Act 60 Puerto Rico\" + real estate combinations\n- \"Luxury homes Dorado Beach\"\n- \"Moving to Puerto Rico with family\"\n\n\n---\n\n\n## 5. User Personas\n\n\n### Primary Persona: UHNW Relocating Families\n\n\n**Demographics:**\n- **Age Range:** 35-55 (rarely under 25 or over 70)\n- **Family Status:** Families with school-age children\n- **Geographic Origin:** US cities and suburbs (NOT rural, NOT international - Act 60 requires US citizenship)\n- **Wealth Level:** Ultra High Net Worth (seeking $1M+ properties)\n\n\n**Motivations:**\n- Puerto Rico Act 60 tax incentives\n- Luxury lifestyle upgrade\n- Quality of life for family\n- Access to premium amenities (Dorado Beach)\n\n\n**Search Behavior (Two-Phase Journey):**\n\n\n*Phase 1: Research/Low Intent*\n- Searching: \"Act 60\", \"tax incentives Puerto Rico\", \"Puerto Rico tax benefits\"\n- Goal: Understanding tax advantages before committing to relocation\n\n\n*Phase 2: Active Search/High Intent*\n- Searching: \"Dorado Beach real estate\", specific neighborhood names, luxury property terms\n- Goal: Finding the right property and agent\n\n\n**Key Concerns & Questions:**\n- Finding the right city/neighborhood\n- Proximity to like-minded UHNW community\n- Safety and security\n- Quality of life indicators\n- Access to high-quality private schools\n- Healthcare/medical facility access\n- **Fear of overpaying** (opaque market, higher prices than origin cities)\n- Process requirements (NAR exclusive agreement)\n\n\n**Communication Preferences:**\n- **Early Stage:** Text/SMS messaging\n- **Later Stage:** Phone calls (when matters become urgent/nuanced)\n\n\n**Ideal Client Characteristics:**\n- Values trusted advisor relationship\n- Appreciates professional expertise\n- Willing to pay full commission\n- Not focused on negotiating agent fees\n- Seeks partnership, not transactional relationship\n- Honest and transparent\n- Ready to commit to exclusive representation\n\n\n**Disqualifying Characteristics (NOT Target Clients):**\n- Sellers with unrealistic pricing expectations\n- Sellers overly focused on commission vs. results\n- Buyers wanting to work with multiple agents simultaneously\n- Anyone dishonest or exhibiting \"shady\" behavior\n- Clients seeking transactional/commodity service\n\n\n---\n\n\n## 6. Brand Positioning & Voice\n\n\n### Brand Personality\n**Three Core Attributes:**\n1. **Expert** - Deep knowledge of Dorado Beach luxury market\n2. **Trustworthy** - Integrity-first approach, client advocate\n3. **Exclusive** - Selective, high-standards, quality over quantity\n\n\n### Brand Positioning Statement\nClear Ocean Group should be positioned as **\"The Only Choice\"** for UHNW families relocating to Dorado Beach. The brand must communicate that choosing a competitor is likely a mistake. We are highly selective about client fit, turning away those who don't align with our values of mutual trust, realistic expectations, and partnership.\n\n\n### Philosophy\n- Quality over quantity in client relationships\n- Only pursue relationships that will leave clients ecstatic\n- Mutual trust and partnership required for success\n- We are advisors, not commodity salespeople\n\n\n### Visual Aesthetic\n- **Style:** Minimal, simple, spacious\n- **Layout:** Lots of padding and white space\n- **Feel:** Luxurious, moody, darker color palette\n- **Quality:** Premium but not ostentatious\n\n\n### Copy Tone & Voice\n- **Supportive** - We're here to guide and help\n- **Educational** - Share knowledge and insights\n- **Confident** - We know this market better than anyone\n- **Authentic** - Like a trusted advisor, not a salesperson\n- **NO sales fluff or BS** - Target audience instantly detects inauthenticity\n\n\n**Critical Consideration:**\nUHNW clients are highly sophisticated and can immediately identify inauthentic sales tactics, fluffy marketing speak, or manipulative language. All copy must be genuine, substantive, and respectful of their intelligence.\n\n\n---\n\n\n## 7. Core Features & Functionality\n\n\n### Platform & Technology Stack\n- **Website Platform:** Luxury Presence\n- **IDX Integration:** Luxury Presence built-in MLS property search\n\n\n### Must-Have Features\n\n\n#### 7.1 Property Search (IDX/MLS Integration)\n- Full MLS integration via Luxury Presence IDX platform\n- Advanced search filters for luxury properties ($1M+)\n- Neighborhood/community filtering\n- Map-based search\n- Save searches and favorites (requires lead capture)\n- Mobile-optimized property browsing\n\n\n#### 7.2 Act 60 Educational Content Hub\n- **Comprehensive Act 60 guide** (rewrite existing poor content)\n- Tax incentive breakdowns\n- Eligibility requirements\n- Application process overview\n- FAQ section addressing common questions\n- **Potential AI Chatbot:** Trained on specific Act 60 documents to answer visitor questions in real-time\n\n\n#### 7.3 Neighborhood Guides (18 Communities)\nCreate detailed, SEO-optimized guides for each target neighborhood:\n- Ritz-Carlton Reserve Residences\n- La Cala\n- Livingston Estates\n- East Beach\n- West Point\n- West Beach\n- Dorado Beach Estates\n- Villa Dorado Estates\n- Dorado Country Estates\n- The Enclave\n- Dorado Beach East\n- The Isles\n- Plantation Village\n- Villa Dorado Condos\n- The Greens\n- The Fairways\n- The Cottages\n- Dorado Plantation\n\n\n**Guide Content Should Include:**\n- Neighborhood overview and character\n- Property types and price ranges\n- School information and ratings\n- Safety and security features\n- Amenities and lifestyle\n- Proximity to healthcare\n- Community demographics\n- Photo galleries\n- Available listings\n\n\n**Purpose:** SEO optimization + paid ad landing pages\n\n\n#### 7.4 Multi-Channel Contact Options (Frictionless Lead Capture)\n**Critical Goal:** Make visitors comfortable taking action without fear of aggressive sales follow-up\n\n\n**Contact Methods:**\n- Contact forms (multiple strategically placed)\n- SMS/Text messaging\n- Email\n- WhatsApp\n- Click-to-call phone\n- Optional: Scheduling tool for consultations\n\n\n**Lead Capture Strategy:**\n- Low-friction initial contact options\n- Progressive disclosure (ask for minimal info initially)\n- Clear communication about follow-up expectations\n- Multiple entry points throughout site\n\n\n#### 7.5 Agent Bios & Team Page\n- **Amanda Grover (Founder/Lead Agent):** Prominent, detailed bio\n  - Personal story and expertise\n  - Why she founded Clear Ocean Group\n  - Her commitment to clients\n  - Professional credentials\n- Additional team member bios (if applicable)\n- Professional photography\n- **Note:** Clients have specifically mentioned appreciating the bios\n\n\n#### 7.6 Gated Market Data (Lead Magnet)\n- Exclusive market reports\n- Pricing trends and analytics\n- Neighborhood comparisons\n- Investment analysis\n- **Gate Requirement:** Verified phone number OR verified email + name\n- Purpose: Generate qualified leads while providing value\n\n\n#### 7.7 Video Sales Letters (VSLs)\n**Quantity:** 1 or more strategic videos\n\n\n**Content:**\n- Introduction to Clear Ocean Group and Amanda Grover\n- Answer frequently asked questions\n- Address common objections\n- Build trust and credibility\n- Showcase expertise and approach\n\n\n**Production Style Recommendation:**\n- **Professional but authentic** - High-quality documentary style\n- Polished production (good lighting, audio, editing)\n- Amanda speaking naturally and conversationally (not scripted/corporate)\n- Genuine and trustworthy feel\n- Matches \"luxurious but relationship-focused\" brand positioning\n- **Avoid:** Corporate promo feel OR low-quality selfie videos\n\n\n#### 7.8 Social Proof & Testimonials\n- Client testimonials (collect more)\n- Case studies / success stories (to be created)\n- Results and outcomes\n- Before/after stories of successful relocations\n\n\n#### 7.9 Content Marketing & SEO\n- Blog for ongoing content (Act 60 updates, market insights, neighborhood spotlights)\n- Optimized meta titles, descriptions, headers\n- Schema markup for local business and real estate\n- Internal linking strategy\n- Content calendar for regular updates\n\n\n---\n\n\n## 8. Technical Requirements & Integrations\n\n\n### Timeline\n- **Target Launch:** ASAP (highest priority)\n\n\n### Required Integrations\n\n\n#### CRM & Marketing\n- **Follow Up Boss** (CRM) - **REQUIRED** integration\n- **Mailchimp** (current email marketing) - flexible, open to alternatives\n\n\n#### Tracking & Analytics (ALL REQUIRED)\n- **Google Tag Manager (GTM)** - Container for all tracking codes\n- **Google Analytics 4** (GA4) - Website analytics\n- **Meta Pixel** - Facebook/Instagram advertising\n- **LinkedIn Insight Tag** - LinkedIn advertising (planning future use)\n\n\n#### Recommended Additional Tracking\n- **Hotjar or Microsoft Clarity** - Heatmaps, session recordings, user behavior analysis\n- **CallRail** (or similar) - Call tracking for phone lead attribution\n\n\n### Mobile Optimization\n- **CRITICAL PRIORITY:** Most users are mobile\n- Mobile-first responsive design\n- Fast mobile load times\n- Touch-friendly navigation and forms\n- Mobile-optimized property search\n- Click-to-call, click-to-text functionality\n\n\n### Legal & Compliance\n- Privacy policy (existing draft available, will review with AI assistance)\n- Luxury Presence may provide templated policies\n- NAR compliance (exclusive buyer agreements, fair housing, etc.)\n- GDPR considerations for international visitors (though not primary audience)\n- Cookie consent banner\n- Terms of service\n\n\n### Platform Capabilities\n- Built on Luxury Presence platform\n- Leverage LP's built-in features and limitations\n- Coordinate with LP development team for custom requirements\n\n\n---\n\n\n## 9. Content & Resources\n\n\n### Existing Assets\n- **Act 60 Guide:** Exists but poorly written (requires major rewrite/update)\n- **Photos/Videos:** Some professional media available, but desire new content\n- **Testimonials:** A few existing, need to collect more\n- **Case Studies:** Can be created from successful client stories\n\n\n### Content Creation Plan\n\n\n#### Responsible Parties\n- **Neighborhood Guides:** Project owner will write with AI assistance\n- **Act 60 Content:** Requires rewriting/updating (AI-assisted)\n- **Website Copy:** Project owner needs copywriting support (AI-assisted)\n- **VSL Scripts:** To be developed (recommend professional scriptwriting)\n- **Testimonials:** Need to collect more from satisfied clients\n- **Case Studies:** Will create success stories\n\n\n#### Assets To Be Created\n- **18 Neighborhood Guides** (high priority for SEO)\n- **Rewritten Act 60 educational content**\n- **Website copy** across all pages\n- **VSL scripts and production**\n- **New professional photography** of properties and Dorado Beach area\n- **New professional videography** for VSLs and property showcases\n- **Additional client testimonials**\n- **Case studies/success stories**\n\n\n#### VSL Production\n- **Approach:** Professional documentary-style production\n- **Talent:** Amanda Grover (Founder/Lead Agent)\n- **Message:** Introduction, FAQs, objection handling, trust-building\n- **Need:** Identify video production partner (recommendations needed)\n\n\n---\n\n\n## 10. Team Structure & Roles\n\n\n### Decision-Making & Ownership\n- **Final Decision Maker:** Project Owner\n- **Primary Luxury Presence Contact:** Project Owner\n- **Content Review & Approval:** Project Owner (Amanda not involved in content review)\n\n\n### Development & Design\n- **Website Development:** Luxury Presence internal team\n- **Platform Management:** Luxury Presence\n\n\n### Content Creation\n- **Strategy & Direction:** Project Owner\n- **Writing:** Project Owner with AI assistance\n- **Professional Media:** External vendors (photography, videography)\n\n\n### Post-Launch Management\n- **Website Management:** Project Owner + Luxury Presence\n- **Content Updates:** Project Owner\n- **Technical Support:** Luxury Presence\n\n\n### External Support Needed\n- Professional photographer for new property/area images\n- Professional videographer for VSL production\n- Potential SEO consultant for keyword strategy and optimization guidance\n\n\n---\n\n\n## 11. Competitive Analysis\n\n\n### Primary Competitor\n**Island & Key**\n- Currently capturing significant traffic from target UHNW demographic\n- Successfully attracting Act 60-motivated buyers\n- **Goal:** Analyze their approach and outperform them in SEO, content, and conversion\n\n\n### Competitive Advantages (Clear Ocean Group)\n- Exclusive focus on Dorado Beach luxury market\n- Deep local expertise\n- Selective, high-integrity client approach\n- Founder-led with personal involvement\n- Premium positioning and service\n\n\n### Differentiation Strategy\n- Position as THE authority on Dorado Beach luxury real estate\n- Emphasize trusted advisor relationship over transactional service\n- Educational content leadership (Act 60 + neighborhoods)\n- Exclusive, selective client acceptance (not for everyone)\n- Authenticity and transparency (no BS sales tactics)\n\n\n---\n\n\n## 12. User Journey & Conversion Funnel\n\n\n### Phase 1: Awareness (Research Stage)\n**User Intent:** Learning about Act 60, exploring Puerto Rico relocation\n\n\n**Entry Points:**\n- Organic search: \"Act 60\", \"Puerto Rico tax incentives\"\n- AI/LLM search results\n- Social media content\n- Paid advertising (future)\n\n\n**Content Needs:**\n- Act 60 educational hub\n- Tax incentive guides\n- Relocation considerations\n- General Dorado Beach information\n\n\n**Conversion Goal:** Capture email for nurturing (low barrier)\n\n\n### Phase 2: Consideration (Active Search Stage)\n**User Intent:** Actively searching for properties and agents\n\n\n**Entry Points:**\n- Organic search: \"Dorado Beach real estate\", neighborhood names\n- Property listing portals (IDX)\n- Neighborhood guide pages\n- Competitor comparisons\n\n\n**Content Needs:**\n- Property listings and IDX search\n- Neighborhood guides\n- Agent bios and credibility indicators\n- Testimonials and case studies\n- VSLs (trust building)\n\n\n**Conversion Goal:** Contact via preferred method, provide phone/email for market data\n\n\n### Phase 3: Decision (Ready to Engage)\n**User Intent:** Selecting agent, ready to begin search process\n\n\n**Content Needs:**\n- Clear process explanation\n- Exclusive buyer agreement information\n- Direct contact with agent\n- Personalized consultation\n\n\n**Conversion Goal:** Schedule call, sign exclusive agreement, begin partnership\n\n\n### Phase 4: Post-Conversion (Client Journey)\n**User Intent:** Finding and closing on property\n\n\n**Touchpoints:**\n- Property alerts\n- Market updates\n- Neighborhood tours\n- Offer strategy\n- Closing support\n\n\n**Goal:** Successful transaction, ecstatic client, testimonial/referral source\n\n\n---\n\n\n## 13. SEO Strategy & Content Requirements\n\n\n### Keyword Research Priority\n- **Note:** Project owner acknowledges need for professional SEO guidance on exact search terms\n- Recommend comprehensive keyword research before finalizing content strategy\n\n\n### Primary Keyword Themes\n1. **Act 60 & Tax Incentives**\n   - \"Act 60 Puerto Rico\"\n   - \"Puerto Rico tax incentives\"\n   - \"Act 60 real estate\"\n   - Related long-tail variations\n\n\n2. **Dorado Beach Real Estate**\n   - \"Dorado Beach real estate\"\n   - \"Luxury homes Dorado Beach\"\n   - \"Dorado Beach properties\"\n   - \"$1M+ homes Dorado Beach\"\n\n\n3. **18 Neighborhood-Specific Keywords**\n   - \"[Neighborhood name] real estate\"\n   - \"Homes for sale [neighborhood name]\"\n   - \"[Neighborhood name] Dorado Beach\"\n   - Each of the 18 communities listed earlier\n\n\n4. **Relocation & Lifestyle**\n   - \"Moving to Puerto Rico with family\"\n   - \"Best neighborhoods Dorado\"\n   - \"Private schools Dorado Beach\"\n   - \"Living in Dorado Beach\"\n\n\n### On-Page SEO Requirements\n- Optimized title tags and meta descriptions\n- Header tag hierarchy (H1, H2, H3)\n- Image alt text\n- Internal linking structure\n- Schema markup (LocalBusiness, RealEstateAgent, FAQPage)\n- Mobile-friendly design\n- Fast page load speeds\n- SSL certificate (HTTPS)\n\n\n### Content Strategy for SEO\n- **18 Neighborhood Landing Pages** (primary SEO focus)\n- **Act 60 Hub Page** with supporting articles\n- **Blog strategy** for ongoing content and topical authority\n- **FAQ pages** (also good for featured snippets)\n- **Market reports** (gated for lead gen, but some preview content for SEO)\n\n\n### LLM/AI Search Optimization\n- Clear, authoritative content structure\n- Direct answers to common questions\n- Factual, well-cited information\n- Structured data markup\n- Comprehensive, in-depth content\n- Natural language that AI can parse and summarize\n\n\n---\n\n\n## 14. Risk Mitigation & Considerations\n\n\n### Technical Risks\n- **Luxury Presence platform limitations** - Confirm all required features are feasible\n- **IDX integration reliability** - Ensure smooth MLS data sync\n- **Mobile performance** - Must rigorously test on mobile devices\n- **Load times** - Optimize for fast performance despite rich media\n\n\n### Content Risks\n- **AI-generated content quality** - Review all AI-assisted content for accuracy and authenticity\n- **Legal accuracy of Act 60 information** - Verify tax information is current and correct (consider legal disclaimer)\n- **Neighborhood guide accuracy** - Ensure all community information is factual and up-to-date\n\n\n### Business Risks\n- **Conversion optimization** - May need iterative testing to improve from near-zero baseline\n- **SEO timeline** - Rankings take time; set realistic expectations (3-6+ months for results)\n- **Competitive response** - Island & Key may improve their site in response\n\n\n### Mitigation Strategies\n- **Phased launch** - Core functionality first, then progressive enhancements\n- **Analytics monitoring** - Track everything from day one to inform optimizations\n- **A/B testing** - Test different CTAs, forms, layouts for conversion optimization\n- **Regular content updates** - Maintain freshness and relevance\n- **Legal review** - Have attorney review Act 60 content and disclaimers\n\n\n---\n\n\n## 15. Success Criteria & Launch Checklist\n\n\n### Pre-Launch Requirements\n- [ ] All 18 neighborhood guides completed and published\n- [ ] Act 60 educational content rewritten and published\n- [ ] IDX property search fully functional\n- [ ] All tracking codes implemented (GTM, GA4, Meta, LinkedIn)\n- [ ] Follow Up Boss CRM integration tested\n- [ ] Multi-channel contact forms functional (email, SMS, WhatsApp)\n- [ ] Agent bios completed with professional photos\n- [ ] At least 1 VSL produced and embedded\n- [ ] Testimonials section populated\n- [ ] Gated market data lead magnet active\n- [ ] Mobile responsiveness thoroughly tested\n- [ ] Privacy policy and legal pages published\n- [ ] All internal links verified\n- [ ] Page load speed optimized\n- [ ] Meta titles and descriptions on all pages\n- [ ] 404 redirects from old site (if applicable)\n- [ ] SSL certificate active\n\n\n### Post-Launch Monitoring (First 30 Days)\n- Daily analytics review (traffic, sources, behavior)\n- Lead capture form submissions and quality\n- Conversion funnel drop-off points\n- Mobile vs. desktop performance\n- Page load speed real-world testing\n- Contact method preferences (form vs. SMS vs. call)\n- Any technical errors or bugs\n\n\n### 90-Day Success Evaluation\n- Qualified lead volume increase\n- Conversion rate improvement\n- SEO ranking progress for target keywords\n- Time on site and engagement metrics\n- User behavior insights from Hotjar/Clarity\n- Lead quality assessment\n- At least 1 signed exclusive agreement attributed to website\n- Positive client feedback on website experience\n\n\n### 6-Month Goals\n- Consistent qualified lead generation\n- Top 3 rankings for priority neighborhood keywords\n- At least 1 closed transaction attributed to website\n- Established content calendar and publishing rhythm\n- Optimized conversion funnel based on data\n- Positive ROI demonstration\n\n\n---\n\n\n## 16. Open Questions & Future Considerations\n\n\n### Immediate Action Items\n1. Select VSL production partner (recommendations needed)\n2. Schedule professional photography/videography shoots\n3. Conduct comprehensive keyword research (consider hiring SEO specialist)\n4. Review and finalize email marketing platform (Mailchimp alternative?)\n5. Collect additional client testimonials\n6. Coordinate with Luxury Presence on technical implementation timeline\n\n\n### Future Enhancements (Post-Launch)\n- Spanish language version (for local Puerto Rico market?)\n- Virtual property tours integration\n- Interactive neighborhood comparison tools\n- Client portal for active buyers\n- Property alert automation\n- Advanced AI chatbot for Act 60 questions\n- Expanded blog and content library\n- Video content library\n- Email drip campaigns for lead nurturing\n- Paid advertising campaigns (Google, Meta, LinkedIn)\n\n\n### Questions for Luxury Presence\n- What are platform limitations we should be aware of?\n- How flexible is the design system?\n- What's the best approach for the 18 neighborhood landing pages?\n- Can we implement custom AI chatbot, or use LP's tools?\n- What's the typical timeline for development?\n- What ongoing support is included post-launch?\n\n\n---\n\n\n## 17. Appendix\n\n\n### Glossary\n- **UHNW:** Ultra High Net Worth (typically $30M+ net worth)\n- **Act 60:** Puerto Rico tax incentive program for new residents\n- **IDX:** Internet Data Exchange (MLS property listing integration)\n- **VSL:** Video Sales Letter\n- **CRM:** Customer Relationship Management system\n- **GTM:** Google Tag Manager\n- **NAR:** National Association of Realtors\n\n\n### Key Documents Referenced\n- Existing Act 60 guide (to be updated)\n- Existing privacy policy (to be reviewed)\n- Current website: www.ClearOceanGroup.com\n\n\n### Stakeholder Contact Information\n- **Project Owner:** [Contact details]\n- **Luxury Presence Account Manager:** [Contact details]\n- **Amanda Grover (Founder/Lead Agent):** [Contact details]\n\n\n---\n\n\n**Document End**\n\n\n*This PRD is a living document and will be updated as the project progresses and requirements evolve.*"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      }
+    ]
+  },
+  "versionId": "07996241-7fd9-46be-bd88-8d236a9ea69c",
+  "activeVersionId": "07996241-7fd9-46be-bd88-8d236a9ea69c",
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-02-06T16:30:01.185Z",
+      "createdAt": "2026-02-06T16:30:01.185Z",
+      "role": "workflow:owner",
+      "workflowId": "xlnw0duy5eryiox4",
+      "projectId": "lco5eT8ukkxUOPne"
+    }
+  ],
+  "activeVersion": {
+    "updatedAt": "2026-02-06T17:11:37.000Z",
+    "createdAt": "2026-02-06T17:11:18.701Z",
+    "versionId": "07996241-7fd9-46be-bd88-8d236a9ea69c",
+    "workflowId": "xlnw0duy5eryiox4",
+    "nodes": [
+      {
+        "parameters": {
+          "workflowInputs": {
+            "values": [
+              {
+                "name": "file_id"
+              },
+              {
+                "name": "new_section"
+              }
+            ]
+          }
+        },
+        "id": "c055762a-8fe7-4141-a639-df2372f30060",
+        "typeVersion": 1.1,
+        "name": "When Executed by Another Workflow",
+        "type": "n8n-nodes-base.executeWorkflowTrigger",
+        "position": [
+          272,
+          352
+        ]
+      },
+      {
+        "parameters": {
+          "operation": "update",
+          "fileId": {
+            "__rl": true,
+            "value": "={{ $('When Executed by Another Workflow').item.json.file_id }}",
+            "mode": "id"
+          },
+          "changeFileContent": true,
+          "options": {}
+        },
+        "type": "n8n-nodes-base.googleDrive",
+        "typeVersion": 3,
+        "position": [
+          1536,
+          352
+        ],
+        "id": "3897e033-9e5c-4568-8212-51e1456b7cd4",
+        "name": "Update file",
+        "credentials": {
+          "googleDriveOAuth2Api": {
+            "id": "Qv2z7eIU19fBjwQ8",
+            "name": "Google Drive account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "operation": "toText",
+          "sourceProperty": "output",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.convertToFile",
+        "typeVersion": 1.1,
+        "position": [
+          1312,
+          352
+        ],
+        "id": "08c83f6a-9175-46dd-bdba-3cf54147f68c",
+        "name": "Convert to File"
+      },
+      {
+        "parameters": {
+          "content": "Download data first then have an AI agent append the new section to the PRD. Convert text data to binary to update the file content.",
+          "height": 80,
+          "width": 352
+        },
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [
+          320,
+          560
+        ],
+        "id": "f17cdfb5-e4e0-499a-9e38-f275cc57f5e2",
+        "name": "Sticky Note"
+      },
+      {
+        "parameters": {
+          "operation": "download",
+          "fileId": {
+            "__rl": true,
+            "value": "={{ $json.file_id }}",
+            "mode": "id"
+          },
+          "options": {
+            "googleFileConversion": {
+              "conversion": {
+                "docsToFormat": "text/plain"
+              }
+            }
+          }
+        },
+        "type": "n8n-nodes-base.googleDrive",
+        "typeVersion": 3,
+        "position": [
+          512,
+          352
+        ],
+        "id": "b1bfdace-0f44-4d4c-bc2b-d766b70f4846",
+        "name": "Download file",
+        "credentials": {
+          "googleDriveOAuth2Api": {
+            "id": "Qv2z7eIU19fBjwQ8",
+            "name": "Google Drive account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "operation": "text",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.extractFromFile",
+        "typeVersion": 1.1,
+        "position": [
+          720,
+          352
+        ],
+        "id": "2a8a7c9d-e93e-4a82-9148-71308c77d074",
+        "name": "Extract from File"
+      },
+      {
+        "parameters": {
+          "promptType": "define",
+          "text": "=Can you add this new findings to the Main PRD file: {{ $('When Executed by Another Workflow').item.json.new_section }}.\n\nIf you encounter any error, the output should just be the content of the Main PRD file (don't add any comments):\n{{ $json.data }}\n\n\n",
+          "options": {
+            "systemMessage": "=You are a context engineer and a project manager specializing in creating comprehensive PRD for spec-driven development. You have access to the main PRD file content and I want you to append or update sections using the new text data from the user.\n\nOutput should be in a markdown format in text and make sure you preserve the structure of the PRD."
+          }
+        },
+        "type": "@n8n/n8n-nodes-langchain.agent",
+        "typeVersion": 3.1,
+        "position": [
+          944,
+          352
+        ],
+        "id": "b2fc7590-a4dc-47c2-99ec-5a447d495183",
+        "name": "AI Agent"
+      },
+      {
+        "parameters": {
+          "model": {
+            "__rl": true,
+            "value": "claude-opus-4-5-20251101",
+            "mode": "list",
+            "cachedResultName": "Claude Opus 4.5"
+          },
+          "options": {}
+        },
+        "type": "@n8n/n8n-nodes-langchain.lmChatAnthropic",
+        "typeVersion": 1.3,
+        "position": [
+          944,
+          576
+        ],
+        "id": "76d9bc87-0f4f-4b11-b005-a79ef804d1f2",
+        "name": "Anthropic Chat Model",
+        "credentials": {
+          "anthropicApi": {
+            "id": "w9UD3iieMwpCO2cX",
+            "name": "Anthropic Claude account"
+          }
+        }
+      },
+      {
+        "parameters": {},
+        "type": "@n8n/n8n-nodes-langchain.toolThink",
+        "typeVersion": 1.1,
+        "position": [
+          1088,
+          576
+        ],
+        "id": "f63f6bab-ea8d-44f5-8d18-23aa737a0255",
+        "name": "Think"
+      }
+    ],
+    "connections": {
+      "When Executed by Another Workflow": {
+        "main": [
+          [
+            {
+              "node": "Download file",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Update file": {
+        "main": [
+          []
+        ]
+      },
+      "Convert to File": {
+        "main": [
+          [
+            {
+              "node": "Update file",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Download file": {
+        "main": [
+          [
+            {
+              "node": "Extract from File",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Extract from File": {
+        "main": [
+          [
+            {
+              "node": "AI Agent",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Anthropic Chat Model": {
+        "ai_languageModel": [
+          [
+            {
+              "node": "AI Agent",
+              "type": "ai_languageModel",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "AI Agent": {
+        "main": [
+          [
+            {
+              "node": "Convert to File",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Think": {
+        "ai_tool": [
+          [
+            {
+              "node": "AI Agent",
+              "type": "ai_tool",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "Joshua Grover",
+    "name": "Version 07996241",
+    "description": "",
+    "autosaved": true
+  },
+  "tags": []
+}
