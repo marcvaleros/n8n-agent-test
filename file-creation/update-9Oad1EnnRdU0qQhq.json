@@ -1,0 +1,148 @@
+{
+  "updatedAt": "2026-02-03T20:12:57.000Z",
+  "createdAt": "2026-02-03T14:16:53.703Z",
+  "id": "9Oad1EnnRdU0qQhq",
+  "name": "File Creation/Update",
+  "active": false,
+  "isArchived": true,
+  "nodes": [
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "mode": "id",
+          "value": ""
+        },
+        "options": {}
+      },
+      "id": "d70222ae-6990-4c6d-8e2e-4b93caa8da0e",
+      "name": "Read PRD from Google Drive",
+      "position": [
+        16,
+        320
+      ],
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "Qv2z7eIU19fBjwQ8",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "fileId": {
+          "__rl": true,
+          "mode": "id",
+          "value": ""
+        },
+        "options": {}
+      },
+      "id": "c1a5ab39-24d9-4547-977e-e9e0a864258b",
+      "name": "Update PRD in Google Drive",
+      "position": [
+        368,
+        304
+      ],
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "Qv2z7eIU19fBjwQ8",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "input"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -288,
+        576
+      ],
+      "id": "20eedcb7-6bbe-4a95-9997-3a64df1d9692",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "operation": "createFromText",
+        "name": "PRD-Version01",
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "11CVVpgK4H-0OVu7p09iu18o_ePGETAqN",
+          "mode": "list",
+          "cachedResultName": "Project",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/11CVVpgK4H-0OVu7p09iu18o_ePGETAqN"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        0,
+        576
+      ],
+      "id": "ebc4e44c-3423-4cce-966b-ac7dd3d04846",
+      "name": "Create file from text",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "Qv2z7eIU19fBjwQ8",
+          "name": "Google Drive account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Create file from text",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "c8988287-7f39-4316-8389-43c96932456f",
+  "activeVersionId": null,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-02-03T14:16:53.712Z",
+      "createdAt": "2026-02-03T14:16:53.712Z",
+      "role": "workflow:owner",
+      "workflowId": "9Oad1EnnRdU0qQhq",
+      "projectId": "lco5eT8ukkxUOPne"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
