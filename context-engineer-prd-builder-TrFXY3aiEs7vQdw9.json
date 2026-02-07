@@ -1,0 +1,268 @@
+{
+  "updatedAt": "2026-02-03T19:57:43.000Z",
+  "createdAt": "2026-02-03T15:48:38.892Z",
+  "id": "TrFXY3aiEs7vQdw9",
+  "name": "Context Engineer PRD Builder",
+  "active": false,
+  "isArchived": true,
+  "nodes": [
+    {
+      "parameters": {
+        "availableInChat": true,
+        "agentName": "Context Engineer Bot",
+        "options": {}
+      },
+      "id": "chat-trigger",
+      "name": "When chat message received",
+      "position": [
+        -16,
+        0
+      ],
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.4,
+      "webhookId": "7f8ed4b8-f246-457e-b831-9ea3785e7f4e"
+    },
+    {
+      "parameters": {
+        "operation": "sanitize",
+        "text": "={{ $json.chatInput }}",
+        "guardrails": {}
+      },
+      "id": "guardrails",
+      "name": "Guardrails",
+      "position": [
+        256,
+        0
+      ],
+      "type": "@n8n/n8n-nodes-langchain.guardrails",
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are a Context Engineer specializing in spec-driven development. Your mission is to collaboratively build a comprehensive Product Requirements Document (PRD) through structured, conversational discovery.\n\n## CORE BEHAVIOR\n\n1. **One Question at a Time**: Ask exactly ONE focused question per response. Never ask multiple questions simultaneously.\n\n2. **Progressive Depth**: Start broad, then drill deeper based on responses:\n   - First: Understand the problem and context\n   - Then: Define goals and success criteria\n   - Next: Identify users and their needs\n   - Finally: Specify features and constraints\n\n3. **Ambiguity Detection**: If a response is vague, incomplete, or contradictory:\n   - Acknowledge what you understood\n   - Ask a specific clarifying question\n   - Provide examples to guide the user\n\n4. **Real-Time Documentation**: After each concrete answer:\n   - Use the update_prd tool to append the information to PRD.md in Google Drive\n   - Briefly confirm what was saved\n   - Proceed to the next logical question\n\n## PRD SECTIONS TO COMPLETE\n\nTrack progress through these sections:\n- [ ] **Problem Statement**: What pain point are we solving?\n- [ ] **Goals & Success Metrics**: How do we measure success?\n- [ ] **Target Users**: Who are the primary and secondary personas?\n- [ ] **User Stories**: What do users need to accomplish?\n- [ ] **Functional Requirements**: What must the system do?\n- [ ] **Non-Functional Requirements**: Performance, security, scalability\n- [ ] **Technical Constraints**: Platform, integrations, limitations\n- [ ] **Out of Scope**: What are we explicitly NOT building?\n- [ ] **Risks & Dependencies**: What could block success?\n- [ ] **Timeline & Milestones**: Key dates and deliverables\n\n## RESPONSE FORMAT\n\n1. **Acknowledge**: Briefly validate or summarize the user's input\n2. **Save**: If answer is concrete, use the Google Drive tool to update PRD.md (upload if none) and confirm\n3. **Ask**: Pose the next targeted question with context on why it matters\n\n## SPECIAL COMMANDS\n\n- If user says \"show PRD\" → Use the read tool to display current PRD contents\n- If user says \"what's next\" → List remaining sections\n- If user says \"done\" or \"finalize\" → Generate final summary and confirm\n\n## CURRENT SESSION\n\nUser Input: {{ $json.guardrailsInput }}",
+        "options": {}
+      },
+      "id": "ai-agent",
+      "name": "Context Engineer Agent",
+      "position": [
+        480,
+        0
+      ],
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "claude-opus-4-5-20251101",
+          "mode": "list",
+          "cachedResultName": "Claude Opus 4.5"
+        },
+        "options": {}
+      },
+      "id": "anthropic-model",
+      "name": "Anthropic Chat Model",
+      "position": [
+        256,
+        320
+      ],
+      "type": "@n8n/n8n-nodes-langchain.lmChatAnthropic",
+      "typeVersion": 1.3,
+      "credentials": {
+        "anthropicApi": {
+          "id": "w9UD3iieMwpCO2cX",
+          "name": "Anthropic Claude account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Context Engineer PRD Builder\n\n**Setup Required:**\n1. Connect your Google Drive credentials to both Google Drive nodes\n2. Create a PRD.md file in Google Drive\n3. Copy the file ID and paste it into both Google Drive nodes\n4. Ensure Anthropic API credentials are configured\n\n**How it works:**\n- Chat with the agent to build your PRD\n- Agent asks one question at a time\n- Answers are saved to Google Drive automatically\n- Say \"show PRD\" to see current state\n- Say \"done\" to finalize",
+        "height": 388,
+        "width": 380
+      },
+      "id": "setup-note",
+      "name": "Setup Instructions",
+      "position": [
+        -496,
+        0
+      ],
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Upload file in Google Drive if there are no PRD.md file in the folder yet",
+        "name": "PRD",
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "11CVVpgK4H-0OVu7p09iu18o_ePGETAqN",
+          "mode": "list",
+          "cachedResultName": "Project",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/11CVVpgK4H-0OVu7p09iu18o_ePGETAqN"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDriveTool",
+      "typeVersion": 3,
+      "position": [
+        752,
+        320
+      ],
+      "id": "141e4a86-a40e-4829-9942-e52eaeafdfdc",
+      "name": "Upload file in Google Drive",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "Qv2z7eIU19fBjwQ8",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "fileId": {
+          "__rl": true,
+          "value": "=15ccJy7EHQz7N3Vo_zzZ-yLaUn20Kz3m1JxSBQSaXtxU",
+          "mode": "id"
+        },
+        "changeFileContent": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDriveTool",
+      "typeVersion": 3,
+      "position": [
+        944,
+        320
+      ],
+      "id": "1786cf85-5e8c-44b3-a1ee-e2cca2121a42",
+      "name": "Update a file in Google Drive",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "Qv2z7eIU19fBjwQ8",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('When chat message received').item.json.sessionId }}",
+        "contextWindowLength": 20
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        464,
+        336
+      ],
+      "id": "b8070aae-e51e-4d28-bdbf-6d2151f67496",
+      "name": "Simple Memory"
+    }
+  ],
+  "connections": {
+    "Anthropic Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "index": 0,
+            "node": "Context Engineer Agent",
+            "type": "ai_languageModel"
+          }
+        ]
+      ]
+    },
+    "Guardrails": {
+      "main": [
+        [
+          {
+            "index": 0,
+            "node": "Context Engineer Agent",
+            "type": "main"
+          }
+        ]
+      ]
+    },
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "index": 0,
+            "node": "Guardrails",
+            "type": "main"
+          }
+        ]
+      ]
+    },
+    "Upload file in Google Drive": {
+      "ai_tool": [
+        [
+          {
+            "node": "Context Engineer Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update a file in Google Drive": {
+      "ai_tool": [
+        [
+          {
+            "node": "Context Engineer Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "Context Engineer Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "saveExecutionProgress": true,
+    "saveManualExecutions": true,
+    "saveDataErrorExecution": "all",
+    "saveDataSuccessExecution": "all",
+    "executionTimeout": 3600,
+    "timezone": "UTC",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "58cc63df-f6f8-4539-9fed-bd3fca246347",
+  "activeVersionId": null,
+  "triggerCount": 1,
+  "shared": [
+    {
+      "updatedAt": "2026-02-03T15:48:38.898Z",
+      "createdAt": "2026-02-03T15:48:38.898Z",
+      "role": "workflow:owner",
+      "workflowId": "TrFXY3aiEs7vQdw9",
+      "projectId": "lco5eT8ukkxUOPne"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
