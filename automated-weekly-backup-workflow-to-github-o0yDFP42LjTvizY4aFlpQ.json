@@ -1,9 +1,9 @@
 {
-  "updatedAt": "2026-02-02T16:03:47.417Z",
+  "updatedAt": "2026-02-02T19:53:13.698Z",
   "createdAt": "2026-02-02T12:45:52.353Z",
   "id": "o0yDFP42LjTvizY4aFlpQ",
   "name": "Automated Weekly Backup Workflow to GitHub",
-  "active": false,
+  "active": true,
   "isArchived": false,
   "nodes": [
     {
@@ -20,7 +20,7 @@
       "name": "Schedule Trigger",
       "position": [
         -2144,
-        -48
+        -64
       ],
       "type": "n8n-nodes-base.scheduleTrigger",
       "typeVersion": 1.2
@@ -32,7 +32,7 @@
         "owner": {
           "__rl": true,
           "mode": "list",
-          "value": "marcvaleros"
+          "value": ""
         },
         "repository": {
           "__rl": true,
@@ -46,16 +46,16 @@
       "id": "bcb15a70-9478-4b18-ac48-bfb74b51d4ef",
       "name": "List files from repo",
       "position": [
-        -1872,
-        -48
+        -1920,
+        -64
       ],
       "type": "n8n-nodes-base.github",
       "typeVersion": 1,
       "webhookId": "354d699e-44b0-4444-9d31-af7fd4ff5561",
       "credentials": {
         "githubApi": {
-          "id": "Oi6lCcQFQFp0rNXd",
-          "name": "GitHub account"
+          "id": "cvAUydTmwGvlJ7uv",
+          "name": "Github - AccountablePartner Acc"
         }
       }
     },
@@ -67,8 +67,8 @@
       "id": "c907c59e-814b-42b2-b3be-414ac474a2ac",
       "name": "Retrieve workflows",
       "position": [
-        -944,
-        -48
+        -2144,
+        240
       ],
       "type": "n8n-nodes-base.n8n",
       "typeVersion": 1,
@@ -102,8 +102,8 @@
       "id": "7d0be49b-ba1e-4c0b-83f3-ed80b36bf702",
       "name": "Get file contents",
       "position": [
-        -1648,
-        -48
+        -1696,
+        -64
       ],
       "type": "n8n-nodes-base.github",
       "typeVersion": 1,
@@ -122,8 +122,8 @@
       "id": "69788dc3-45a9-4d68-ab8f-3afd65d56aa1",
       "name": "Parse workflow IDs",
       "position": [
-        -1424,
-        -48
+        -1472,
+        -64
       ],
       "type": "n8n-nodes-base.code",
       "typeVersion": 2
@@ -135,8 +135,8 @@
       "id": "bfb85c2a-594e-45e3-bcc3-cccb74213b88",
       "name": "Create workflow map",
       "position": [
-        -1200,
-        -48
+        -1248,
+        -64
       ],
       "type": "n8n-nodes-base.code",
       "typeVersion": 2
@@ -152,45 +152,11 @@
       "id": "ac42fc37-0419-4117-8d55-c419383ee5d7",
       "name": "Json file1",
       "position": [
-        -704,
-        -48
+        -1920,
+        240
       ],
       "type": "n8n-nodes-base.convertToFile",
       "typeVersion": 1.1
-    },
-    {
-      "parameters": {
-        "resource": "file",
-        "operation": "edit",
-        "owner": {
-          "__rl": true,
-          "mode": "name",
-          "value": "marcvaleros"
-        },
-        "repository": {
-          "__rl": true,
-          "mode": "name",
-          "value": "N8N-Repository"
-        },
-        "filePath": "=workflows/{{ $('Commit date & file name1').item.json.fileName }}",
-        "fileContent": "={{ $('To base').item.json.data }}",
-        "commitMessage": "=Updated workflow: {{ $('Commit date & file name1').item.json.fileName }} - {{ $('Commit date & file name1').item.json.commitDate }}"
-      },
-      "id": "8e4db3ff-9d20-457e-a0ab-ae6dc25345c1",
-      "name": "Update File1",
-      "position": [
-        192,
-        -160
-      ],
-      "type": "n8n-nodes-base.github",
-      "typeVersion": 1,
-      "webhookId": "ce4b561b-acb9-4cd8-b76f-4928dada9674",
-      "credentials": {
-        "githubApi": {
-          "id": "Oi6lCcQFQFp0rNXd",
-          "name": "GitHub account"
-        }
-      }
     },
     {
       "parameters": {
@@ -220,8 +186,8 @@
       "id": "576e2c2a-9fa7-4003-8f29-6a4eca57802a",
       "name": "Check if workflow ID exists1",
       "position": [
-        -32,
-        -48
+        -1248,
+        240
       ],
       "type": "n8n-nodes-base.if",
       "typeVersion": 2
@@ -255,8 +221,8 @@
       "id": "9b3bb123-0884-4fa7-bf97-7e704dcd3b66",
       "name": "Commit date & file name1",
       "position": [
-        -256,
-        -48
+        -1472,
+        240
       ],
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4
@@ -269,8 +235,8 @@
       "id": "ad0a2700-114f-4603-a219-ab42012c5906",
       "name": "To base",
       "position": [
-        -480,
-        -48
+        -1696,
+        240
       ],
       "type": "n8n-nodes-base.extractFromFile",
       "typeVersion": 1
@@ -295,10 +261,10 @@
         "commitMessage": "=New workflow: {{ $('Commit date & file name1').item.json.fileName }} - {{ $('Commit date & file name1').item.json.commitDate }}"
       },
       "id": "04d6945a-fddd-4986-8df8-a6e04196dc8a",
-      "name": "Upload file1",
+      "name": "Create File",
       "position": [
-        192,
-        64
+        -1024,
+        336
       ],
       "type": "n8n-nodes-base.github",
       "typeVersion": 1,
@@ -313,6 +279,7 @@
     {
       "parameters": {
         "resource": "file",
+        "operation": "edit",
         "owner": {
           "__rl": true,
           "mode": "name",
@@ -320,18 +287,20 @@
         },
         "repository": {
           "__rl": true,
-          "mode": "name",
-          "value": "N8N-Repository"
+          "value": "n8n-agent-test",
+          "mode": "list",
+          "cachedResultName": "n8n-agent-test",
+          "cachedResultUrl": "https://github.com/marcvaleros/n8n-agent-test"
         },
-        "filePath": "=workflows/{{ $('Commit date & file name1').item.json.fileName }}",
+        "filePath": "={{ $('Commit date & file name1').item.json.fileName }}",
         "fileContent": "={{ $('To base').item.json.data }}",
-        "commitMessage": "=New workflow: {{ $('Commit date & file name1').item.json.fileName }} - {{ $('Commit date & file name1').item.json.commitDate }}"
+        "commitMessage": "=Updated workflow: {{ $('Commit date & file name1').item.json.fileName }} - {{ $('Commit date & file name1').item.json.commitDate }}"
       },
-      "id": "b4240de5-2bf1-4e03-a973-0e4e7c881191",
-      "name": "Upload file",
+      "id": "8e4db3ff-9d20-457e-a0ab-ae6dc25345c1",
+      "name": "Update File",
       "position": [
-        192,
-        272
+        -1024,
+        144
       ],
       "type": "n8n-nodes-base.github",
       "typeVersion": 1,
@@ -426,14 +395,14 @@
       "main": [
         [
           {
-            "node": "Update File1",
+            "node": "Update File",
             "type": "main",
             "index": 0
           }
         ],
         [
           {
-            "node": "Upload file1",
+            "node": "Create File",
             "type": "main",
             "index": 0
           }
@@ -472,9 +441,9 @@
     "templateCredsSetupCompleted": true
   },
   "pinData": {},
-  "versionId": "0c1e6900-a9a5-4aa0-8976-b41955a8ec13",
-  "activeVersionId": null,
-  "triggerCount": 0,
+  "versionId": "4121e482-4625-4c96-96f8-8db3d7d8dd77",
+  "activeVersionId": "828cd228-5314-4f20-8436-4f74d9f47672",
+  "triggerCount": 1,
   "shared": [
     {
       "updatedAt": "2026-02-02T12:45:52.365Z",
@@ -484,6 +453,442 @@
       "projectId": "lco5eT8ukkxUOPne"
     }
   ],
-  "activeVersion": null,
+  "activeVersion": {
+    "updatedAt": "2026-02-02T17:13:49.000Z",
+    "createdAt": "2026-02-02T17:13:39.459Z",
+    "versionId": "828cd228-5314-4f20-8436-4f74d9f47672",
+    "workflowId": "o0yDFP42LjTvizY4aFlpQ",
+    "nodes": [
+      {
+        "parameters": {
+          "rule": {
+            "interval": [
+              {
+                "field": "weeks"
+              }
+            ]
+          }
+        },
+        "id": "2904e2eb-e05f-4d78-92d3-f76931b76fc6",
+        "name": "Schedule Trigger",
+        "position": [
+          -2144,
+          -64
+        ],
+        "type": "n8n-nodes-base.scheduleTrigger",
+        "typeVersion": 1.2
+      },
+      {
+        "parameters": {
+          "resource": "file",
+          "operation": "list",
+          "owner": {
+            "__rl": true,
+            "mode": "list",
+            "value": "marcvaleros"
+          },
+          "repository": {
+            "__rl": true,
+            "value": "n8n-agent-test",
+            "mode": "list",
+            "cachedResultName": "n8n-agent-test",
+            "cachedResultUrl": "https://github.com/marcvaleros/n8n-agent-test"
+          }
+        },
+        "alwaysOutputData": true,
+        "id": "bcb15a70-9478-4b18-ac48-bfb74b51d4ef",
+        "name": "List files from repo",
+        "position": [
+          -1920,
+          -64
+        ],
+        "type": "n8n-nodes-base.github",
+        "typeVersion": 1,
+        "webhookId": "354d699e-44b0-4444-9d31-af7fd4ff5561",
+        "credentials": {
+          "githubApi": {
+            "id": "Oi6lCcQFQFp0rNXd",
+            "name": "GitHub account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "filters": {},
+          "requestOptions": {}
+        },
+        "id": "c907c59e-814b-42b2-b3be-414ac474a2ac",
+        "name": "Retrieve workflows",
+        "position": [
+          -1024,
+          -64
+        ],
+        "type": "n8n-nodes-base.n8n",
+        "typeVersion": 1,
+        "credentials": {
+          "n8nApi": {
+            "id": "uRWD6Ts1lvjgz0pk",
+            "name": "n8n account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "resource": "file",
+          "operation": "get",
+          "owner": {
+            "__rl": true,
+            "mode": "name",
+            "value": "marcvaleros"
+          },
+          "repository": {
+            "__rl": true,
+            "value": "n8n-agent-test",
+            "mode": "list",
+            "cachedResultName": "n8n-agent-test",
+            "cachedResultUrl": "https://github.com/marcvaleros/n8n-agent-test"
+          },
+          "filePath": "={{ $json.path }}",
+          "asBinaryProperty": false,
+          "additionalParameters": {}
+        },
+        "id": "7d0be49b-ba1e-4c0b-83f3-ed80b36bf702",
+        "name": "Get file contents",
+        "position": [
+          -1696,
+          -64
+        ],
+        "type": "n8n-nodes-base.github",
+        "typeVersion": 1,
+        "webhookId": "c331f611-95a2-4b7a-9707-0acf563c9c5b",
+        "credentials": {
+          "githubApi": {
+            "id": "Oi6lCcQFQFp0rNXd",
+            "name": "GitHub account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "jsCode": "// Parse each file content to extract workflow ID\nconst items = $input.all();\nconst outputItems = [];\n\nfor (const item of items) {\n  try {\n    // Skip if no content (empty repo case)\n    if (!item.json.content) {\n      continue;\n    }\n    \n    // Decode base64 content\n    const content = Buffer.from(item.json.content, 'base64').toString('utf-8');\n    const workflowData = JSON.parse(content);\n    \n    outputItems.push({\n      json: {\n        fileName: item.json.name,\n        filePath: item.json.path,\n        workflowId: workflowData.id,\n        sha: item.json.sha,\n        empty: false\n      }\n    });\n  } catch (error) {\n    // Skip files that can't be parsed\n    console.log(`Could not parse file ${item.json.name}: ${error.message}`);\n  }\n}\n\n// Always return at least one item, even if empty\nif (outputItems.length === 0) {\n  return [{ json: { empty: true } }];\n}\n\nreturn outputItems;"
+        },
+        "id": "69788dc3-45a9-4d68-ab8f-3afd65d56aa1",
+        "name": "Parse workflow IDs",
+        "position": [
+          -1472,
+          -64
+        ],
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2
+      },
+      {
+        "parameters": {
+          "jsCode": "// Create a map of workflow IDs to their files\nconst items = $input.all();\nconst workflowMap = {};\nconst workflowIDs = [];\n\nfor (const item of items) {\n  // Skip empty marker\n  if (item.json.empty) {\n    continue;\n  }\n  \n  // Only add if workflowId exists\n  if (item.json.workflowId) {\n    workflowMap[item.json.workflowId] = {\n      fileName: item.json.fileName,\n      filePath: item.json.filePath,\n      sha: item.json.sha\n    };\n\n    workflowIDs.push(item.json.workflowId);\n  }\n}\n\n// Always return a valid object (even if empty)\nreturn [{\n  json: {\n    workflowMap: workflowMap,\n    workflowIDs\n  }\n}];"
+        },
+        "id": "bfb85c2a-594e-45e3-bcc3-cccb74213b88",
+        "name": "Create workflow map",
+        "position": [
+          -1248,
+          -64
+        ],
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2
+      },
+      {
+        "parameters": {
+          "operation": "toJson",
+          "mode": "each",
+          "options": {
+            "format": true
+          }
+        },
+        "id": "ac42fc37-0419-4117-8d55-c419383ee5d7",
+        "name": "Json file1",
+        "position": [
+          -800,
+          -64
+        ],
+        "type": "n8n-nodes-base.convertToFile",
+        "typeVersion": 1.1
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "strict",
+              "version": 1
+            },
+            "conditions": [
+              {
+                "id": "f278dda6-20f7-4ac3-8f85-55d30bba5f2d",
+                "leftValue": "={{ $('Create workflow map').item.json.workflowIDs }}",
+                "rightValue": "={{ $json.workflowId }}",
+                "operator": {
+                  "type": "array",
+                  "operation": "contains",
+                  "rightType": "any"
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "options": {}
+        },
+        "id": "576e2c2a-9fa7-4003-8f29-6a4eca57802a",
+        "name": "Check if workflow ID exists1",
+        "position": [
+          -128,
+          -64
+        ],
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "fe4a36ef-9f04-40e3-99bd-cc517a49b440",
+                "name": "commitDate",
+                "type": "string",
+                "value": "={{ $now.format('dd-MM-yyyy/H:mm') }}"
+              },
+              {
+                "id": "b0fe1bcc-e79c-4a6b-b8b4-44222c8bf4e8",
+                "name": "fileName",
+                "type": "string",
+                "value": "={{ $('Retrieve workflows').item.json.name.replace(/\\s+/g, '-').toLowerCase() }}-{{ $('Retrieve workflows').item.json.id }}.json"
+              },
+              {
+                "id": "workflow-id-field",
+                "name": "workflowId",
+                "type": "string",
+                "value": "={{ $('Retrieve workflows').item.json.id }}"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "id": "9b3bb123-0884-4fa7-bf97-7e704dcd3b66",
+        "name": "Commit date & file name1",
+        "position": [
+          -352,
+          -64
+        ],
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4
+      },
+      {
+        "parameters": {
+          "operation": "binaryToPropery",
+          "options": {}
+        },
+        "id": "ad0a2700-114f-4603-a219-ab42012c5906",
+        "name": "To base",
+        "position": [
+          -576,
+          -64
+        ],
+        "type": "n8n-nodes-base.extractFromFile",
+        "typeVersion": 1
+      },
+      {
+        "parameters": {
+          "resource": "file",
+          "owner": {
+            "__rl": true,
+            "mode": "name",
+            "value": "marcvaleros"
+          },
+          "repository": {
+            "__rl": true,
+            "value": "n8n-agent-test",
+            "mode": "list",
+            "cachedResultName": "n8n-agent-test",
+            "cachedResultUrl": "https://github.com/marcvaleros/n8n-agent-test"
+          },
+          "filePath": "={{ $('Commit date & file name1').item.json.fileName }}",
+          "fileContent": "={{ $('To base').item.json.data }}",
+          "commitMessage": "=New workflow: {{ $('Commit date & file name1').item.json.fileName }} - {{ $('Commit date & file name1').item.json.commitDate }}"
+        },
+        "id": "04d6945a-fddd-4986-8df8-a6e04196dc8a",
+        "name": "Create File",
+        "position": [
+          96,
+          32
+        ],
+        "type": "n8n-nodes-base.github",
+        "typeVersion": 1,
+        "webhookId": "ce4b561b-acb9-4cd8-b76f-4928dada9674",
+        "credentials": {
+          "githubApi": {
+            "id": "Oi6lCcQFQFp0rNXd",
+            "name": "GitHub account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "resource": "file",
+          "operation": "edit",
+          "owner": {
+            "__rl": true,
+            "mode": "name",
+            "value": "marcvaleros"
+          },
+          "repository": {
+            "__rl": true,
+            "value": "n8n-agent-test",
+            "mode": "list",
+            "cachedResultName": "n8n-agent-test",
+            "cachedResultUrl": "https://github.com/marcvaleros/n8n-agent-test"
+          },
+          "filePath": "={{ $('Commit date & file name1').item.json.fileName }}",
+          "fileContent": "={{ $('To base').item.json.data }}",
+          "commitMessage": "=Updated workflow: {{ $('Commit date & file name1').item.json.fileName }} - {{ $('Commit date & file name1').item.json.commitDate }}"
+        },
+        "id": "8e4db3ff-9d20-457e-a0ab-ae6dc25345c1",
+        "name": "Update File",
+        "position": [
+          96,
+          -160
+        ],
+        "type": "n8n-nodes-base.github",
+        "typeVersion": 1,
+        "webhookId": "ce4b561b-acb9-4cd8-b76f-4928dada9674",
+        "credentials": {
+          "githubApi": {
+            "id": "Oi6lCcQFQFp0rNXd",
+            "name": "GitHub account"
+          }
+        }
+      }
+    ],
+    "connections": {
+      "List files from repo": {
+        "main": [
+          [
+            {
+              "node": "Get file contents",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Schedule Trigger": {
+        "main": [
+          [
+            {
+              "node": "List files from repo",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Retrieve workflows": {
+        "main": [
+          [
+            {
+              "node": "Json file1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Get file contents": {
+        "main": [
+          [
+            {
+              "node": "Parse workflow IDs",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Parse workflow IDs": {
+        "main": [
+          [
+            {
+              "node": "Create workflow map",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Create workflow map": {
+        "main": [
+          [
+            {
+              "node": "Retrieve workflows",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Json file1": {
+        "main": [
+          [
+            {
+              "node": "To base",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Check if workflow ID exists1": {
+        "main": [
+          [
+            {
+              "node": "Update File",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Create File",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Commit date & file name1": {
+        "main": [
+          [
+            {
+              "node": "Check if workflow ID exists1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "To base": {
+        "main": [
+          [
+            {
+              "node": "Commit date & file name1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "Joshua Grover",
+    "name": "Version 828cd228",
+    "description": "change the layout",
+    "autosaved": true
+  },
   "tags": []
 }
